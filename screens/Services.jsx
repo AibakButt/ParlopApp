@@ -7,6 +7,16 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
+import { connect } from "react-redux";
+import {
+  fetchCategories,
+} from "./../redux/actions/categoryActions";
+import {
+  fetchServices
+} from './../redux/actions/serviceActions';
+import {
+  addToCart
+} from './../redux/actions/cartActions';
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { TabView, SceneMap } from 'react-native-tab-view';
@@ -17,17 +27,14 @@ const { width, height } = Dimensions.get("window");
 
 class Services extends Component {
   state = {
-    services: [],
     active: this.props.route.params,
   };
 
   componentDidMount() {
-     
-    this.setState({ services: this.props.services });
+    this.props.fetchServices();
   }
 
   handleTab = tab => {
-    
     this.setState({ active: tab });
   };
 
@@ -48,10 +55,26 @@ class Services extends Component {
     );
   }
 
+  addServiceToCart(service){
+    this.props.addToCart(service);
+  }
+
+  isAlreadyInCart(serviceId){
+    let already = false;
+     if(this.props.cartServices && this.props.cartServices.length>0) {
+       this.props.cartServices.forEach(ser => {
+          if(ser._id === serviceId){
+            already=true;
+          }
+       });
+      }
+
+      return already;
+  }
+
 
   render(){
     const {categories, services} = this.props;
-
     return (
         <Block>
             <Block flex={false} margin={10}>
@@ -91,8 +114,10 @@ class Services extends Component {
                                 <Button style={{paddingBottom:20}}>
                                     <Text center accent>add-ons</Text>
                                 </Button>
-                                <Button color={theme.colors.gray2} >
-                                    <Text style={{ padding:20}} bold size={20}>+</Text>
+                                <Button color={(!this.isAlreadyInCart(service._id))?theme.colors.gray2:theme.colors.primary} 
+                                  disabled={this.isAlreadyInCart(service._id)}
+                                  onPress={() => this.addServiceToCart(service)}>
+                                    <Text style={{ padding:20}} bold size={20}>{(!this.isAlreadyInCart(service._id))?'+':'added'}</Text>
                                 </Button>
                             </Block>
                         </Block>
@@ -102,18 +127,24 @@ class Services extends Component {
                 </ScrollView>
             </Block>
 
-
         </Block>
     )
    }   
 }
 
-Services.defaultProps = {
-  services: mocks.services,
-  categories: mocks.categories
-};
+const mapStateToProps = (state) => ({
+  categories: state.categoryReducer.categories,
+  services : state.serviceReducer.services,
+  cartServices: state.cartReducer.cartServices
+});
 
-export default Services;
+const mapDispatchToProps = (dispatch) => ({
+  fetchCategories: () => fetchCategories(dispatch),
+  fetchServices: () => fetchServices(dispatch),
+  addToCart: (service) => addToCart(dispatch,service),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Services);
 
 const styles = StyleSheet.create({
   header: {

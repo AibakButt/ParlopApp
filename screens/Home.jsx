@@ -8,11 +8,17 @@ import {
   FlatList,
   Animated
 } from "react-native";
+import { connect } from "react-redux";
+import {
+  fetchCategories,
+} from "./../redux/actions/categoryActions";
+
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
 
 const { width, height } = Dimensions.get("window");
+
 
 class Home extends Component {
   state = {
@@ -36,7 +42,7 @@ class Home extends Component {
   scrollX = new Animated.Value(0);
 
   componentDidMount() {
-    this.setState({ categories: this.props.categories });
+    this.props.fetchCategories();
   }
 
   renderCarousel() {
@@ -77,9 +83,8 @@ class Home extends Component {
 
   render() {
     const { profile, navigation } = this.props;
-    const { categories } = this.state;
+    const { categories } = this.props;
     const tabs = ["Products", "Inspirations", "Shop"];
-
     return (
       <Block>
         <Block flex={false} row center space="between" style={styles.header}>
@@ -113,7 +118,7 @@ class Home extends Component {
                     size={50}
                     color="rgba(41,216,143,0.20)"
                   >
-                    <Image source={category.icon} style={{
+                    <Image source={{uri: category.icon}} style={{
                         resizeMode: "contain",
                         height: 80,
                         width: 200
@@ -135,12 +140,15 @@ class Home extends Component {
   }
 }
 
-Home.defaultProps = {
-  profile: mocks.profile,
-  categories: mocks.categories
-};
+const mapStateToProps = (state) => ({
+  categories: state.categoryReducer.categories
+});
 
-export default Home;
+const mapDispatchToProps = (dispatch) => ({
+  fetchCategories: () => fetchCategories(dispatch)
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const styles = StyleSheet.create({
   header: {
