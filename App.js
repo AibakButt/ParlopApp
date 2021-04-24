@@ -5,12 +5,14 @@ import MyTabs from './navigation/index';
 import MyStack from './navigation/index';
 import { Provider } from 'react-redux';
 import store from './redux/index';
+import Register from './screens/Register';
 
 export default function App() {
   return (
       <Provider store={store}>
         <NavigationContainer>
           <MyTabs />
+          {/* <Register/> */}
         </NavigationContainer>
       </Provider>
   );
