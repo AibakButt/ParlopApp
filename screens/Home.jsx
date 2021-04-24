@@ -6,12 +6,15 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
-  Animated
+  Animated,
+  StatusBar,
+  NativeModules
 } from "react-native";
 import { connect } from "react-redux";
 import {
   fetchCategories,
 } from "./../redux/actions/categoryActions";
+const { StatusBarManager } = NativeModules;
 
 
 import { Card, Badge, Button, Block, Text } from "../components";
@@ -86,14 +89,25 @@ class Home extends Component {
     const { categories } = this.props;
     const tabs = ["Products", "Inspirations", "Shop"];
     return (
-      <Block>
-        <Block flex={false} row center space="between" style={styles.header}>
-        <Text h2 center bold>
-            <Text h1 primary>
-            Parlor{" "}
+      <Block color={theme.colors.gray2}>
+        <Block flex={false} row  space="between" style={styles.header}>
+          <Block flex={8} bottom>
+          {/* <Image
+                source={require('../assets/images/icon.jpg')}
+                resizeMode="contain"
+                style={{ width : 50, height: 50, overflow: "visible" }}
+              /> */}
+            <Text h1 accent bold>
+                <Text h1 accent>
+                Parlor{" "}
+                </Text>
+                At Home
             </Text>
-            At Home
-        </Text>
+            
+          </Block>
+          <Block flex={2} middle>
+            <Text gray>Lahore</Text>
+          </Block>
         </Block>
 
         
@@ -104,7 +118,7 @@ class Home extends Component {
         </Block>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ paddingVertical: theme.sizes.base * 3.5 }}
+          style={{ marginVertical: theme.sizes.base * 1.5,  paddingVertical: theme.sizes.base * 0.5,  }}
         >
           <Block flex={false} row space="between" style={styles.categories}>
             {categories.map(category => (
@@ -152,7 +166,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(Home);
 
 const styles = StyleSheet.create({
   header: {
-    paddingHorizontal: theme.sizes.base * 2
+    paddingHorizontal: theme.sizes.base ,
+    paddingTop: Platform.OS === 'ios' ? 25 : StatusBarManager.HEIGHT * 1.5,
+    paddingBottom: theme.sizes.base
   },
   avatar: {
     height: theme.sizes.base * 2.2,
