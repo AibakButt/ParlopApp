@@ -6,6 +6,7 @@ import MyStack from './navigation/index';
 import { Provider } from 'react-redux';
 import store from './redux/index';
 import Register from './screens/Register';
+import ScheduleOrder from './screens/ScheduleOrder';
 
 export default function App() {
   return (
@@ -13,6 +14,7 @@ export default function App() {
         <NavigationContainer>
           <MyTabs />
           {/* <Register/> */}
+          {/* <ScheduleOrder/> */}
         </NavigationContainer>
       </Provider>
   );

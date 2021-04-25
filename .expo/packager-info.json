@@ -3,8 +3,8 @@
   "expoServerPort": 19000,
   "packagerPort": 19000,
   "packagerPid": null,
-  "expoServerNgrokUrl": null,
-  "packagerNgrokUrl": null,
-  "ngrokPid": null,
+  "expoServerNgrokUrl": "https://22-55h.aibak.parlopapp.exp.direct",
+  "packagerNgrokUrl": "https://packager.22-55h.aibak.parlopapp.exp.direct",
+  "ngrokPid": 16120,
   "webpackServerPort": null
 }
