@@ -19,6 +19,7 @@ const { StatusBarManager } = NativeModules;
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
+import Icon from "../components/Icon";
 
 const { width, height } = Dimensions.get("window");
 
@@ -105,7 +106,13 @@ class Home extends Component {
             </Text>
             
           </Block>
-          <Block flex={2} middle>
+          <Block flex={2} row middle>
+            <Icon
+                name={'location-pin'}
+                type={ 'entypo'}
+                size={22}
+                color={theme.colors.accent}
+              />
             <Text gray>Lahore</Text>
           </Block>
         </Block>
