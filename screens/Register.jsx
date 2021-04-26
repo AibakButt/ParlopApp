@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, Image, Dimensions, TextInput, TouchableOpacity, Keyboard } from 'react-native';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Animated, { Easing } from 'react-native-reanimated';
 import { TapGestureHandler, State, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Icon from '../components/Icon';
+import { connect } from "react-redux";
+import {  handleTextChangeNumber,handleTextChangeCode, sendCode, reSendCode, verifyCode } from './../redux/actions/authentication';
 import { theme } from '../constants';
 import { Block } from '../components';
 const { width, height } = Dimensions.get('window');
@@ -126,6 +128,38 @@ class Register extends Component {
     });
 
   }
+
+  sendCode = async () =>{
+
+    this.setState({codeFeildShow: true})
+    const storeData = async () => {
+      try {
+        await AsyncStorage.setItem('isFirstTime', false);
+      } catch (e) {
+        // saving error
+      }
+    }
+
+    const getData = async () => {
+      try {
+        const value = await AsyncStorage.getItem('isFirstTime')
+        if(value !== null) {
+          // value previously stored
+          return value;
+        }
+      } catch(e) {
+        // error reading value
+      }
+    }
+
+    if(!getData()){
+      await storeData();
+    }
+
+    this.props.sendCode(this.props.auth);
+
+  }
+
   render() {
     return (
       <View
@@ -228,9 +262,12 @@ class Register extends Component {
                             <TextInput
                                 keyboardType='numeric'
                                 placeholder="Phone Number"
+                                name="phoneNumber"
+                                value={this.props.auth.phoneNumber}
+                                onChangeText={(e) => { console.log('event',e); this.props.handleTextChangeNumber(e)}}
                                 style={styles.textInput}
                             />
-                            <TouchableOpacity style={styles.next} onPress={() => this.setState({codeFeildShow: true})}>
+                            <TouchableOpacity style={styles.next} onPress={() => this.sendCode()}>
                                 <Text style={{color: 'white'}}>
                                     Send Code
                                 </Text>
@@ -250,7 +287,19 @@ class Register extends Component {
     );
   }
 }
-export default Register;
+
+const mapStateToProps = (state) => ({
+  auth: state.authReducer.auth
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  handleTextChangeNumber: (e) => handleTextChangeNumber(dispatch, e),
+  sendCode: (auth) => sendCode(dispatch,auth),
+  reSendCode: (auth) => reSendCode(dispatch,auth),
+  verifyCode: (auth) => verifyCode(dispatch,auth),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Register);
 
 const styles = StyleSheet.create({
   container: {
