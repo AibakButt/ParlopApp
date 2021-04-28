@@ -5,7 +5,15 @@ import Animated, { Easing } from 'react-native-reanimated';
 import { TapGestureHandler, State, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Icon from '../components/Icon';
 import { connect } from "react-redux";
-import {  handleTextChangeNumber,handleTextChangeCode, sendCode, reSendCode, verifyCode } from './../redux/actions/authentication';
+import {  
+  handleTextChangeNumber,
+  handleTextChangeCode,
+  handleTextChangeName, 
+  sendCode, 
+  reSendCode,
+  verifyCode,
+  saveCustomer,
+} from './../redux/actions/authentication';
 import { theme } from '../constants';
 import { Block } from '../components';
 const { width, height } = Dimensions.get('window');
@@ -160,6 +168,23 @@ class Register extends Component {
 
   }
 
+  verify = async () => {
+    await this.props.verifyCode(this.props.auth);
+    if(this.props.auth.isAuth){
+      this.setState({nameShow: true});
+    }
+    
+  }
+
+  saveCust = async () => {
+    await this.props.saveCustomer(this.props.auth);
+    if(this.props.auth.isCreated){
+      
+    }
+    
+  }
+  
+
   render() {
     return (
       <View
@@ -215,23 +240,27 @@ class Register extends Component {
                     <Block>
                         <TextInput
                             placeholder="Your Name"
+                            nameCustomer
+                            name="nameCustomer"
+                            value={this.props.auth.nameCustomer}
+                            onChangeText={(e) => { console.log('event',e); this.props.handleTextChangeName(e)}}
                             style={styles.textInput}
                         />
                         <Block row middle marginTop={theme.sizes.base}>
                             <Block>
-                                <TouchableOpacity style={styles.next} onPress={() => this.setState({nameShow: false})}>
+                                <TouchableOpacity style={styles.next} onPress={() => this.saveCust()}>
                                     <Text style={{color: theme.colors.white}}>
                                         Continue
                                     </Text>
                                 </TouchableOpacity>
                             </Block>
-                            <Block>
+                            {/* <Block>
                                 <TouchableOpacity style={styles.nextOutline} onPress={() => this.setState({nameShow: false})}>
                                     <Text style={{color: theme.colors.accent}}>
                                         View Intro
                                     </Text>
                                 </TouchableOpacity>
-                            </Block>
+                            </Block> */}
                         </Block>
                     </Block>
                 ) : (
@@ -240,9 +269,12 @@ class Register extends Component {
                             <TextInput
                                 keyboardType='numeric'
                                 placeholder="Code"
+                                name="code"
+                                value={this.props.auth.code}
+                                onChangeText={(e) => { console.log('event',e); this.props.handleTextChangeCode(e)}}
                                 style={styles.textInput}
                             />
-                            <TouchableOpacity style={styles.next} onPress={() => this.setState({nameShow: true})}>
+                            <TouchableOpacity style={styles.next} onPress={() =>  this.verify()}>
                                 <Text style={{color: 'white'}}>
                                     Verify
                                 </Text>
@@ -252,7 +284,7 @@ class Register extends Component {
                                 <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
                                     <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
                                 </TouchableOpacity>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={() => this.props.reSendCode(this.props.auth)}>
                                     <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Resend Code</Text>
                                 </TouchableOpacity>
                             </Block>
@@ -294,9 +326,12 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   handleTextChangeNumber: (e) => handleTextChangeNumber(dispatch, e),
+  handleTextChangeCode: (e) => handleTextChangeCode(dispatch, e),
+  handleTextChangeName: (e) => handleTextChangeName(dispatch, e),
   sendCode: (auth) => sendCode(dispatch,auth),
   reSendCode: (auth) => reSendCode(dispatch,auth),
   verifyCode: (auth) => verifyCode(dispatch,auth),
+  saveCustomer: (auth) => saveCustomer(dispatch,auth),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);

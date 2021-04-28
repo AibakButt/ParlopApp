@@ -5,17 +5,21 @@ const apiEndPoint = "https://parlor-server.herokuapp.com/api/customer";
 
 export const sendCode = async (dispatch , auth) => {
   try {
-      console.log('gvvhg',auth);
-    const { data } = await axios.post(apiEndPoint + "/send-code" ,auth );
-     console.log('data',data);
-    if(data){
-        let auth = {...store.getState().authReducer.auth};
-        auth.request_id = data.request_id;
-    }
     
+    const { data } = await axios.post(apiEndPoint + "/send-code" ,auth );
+
+    console.log('data',data);
+     
+    let auths = {...store.getState().authReducer.auth};
+    if(data){
+        auths.request_id = data.request_id;
+        auths.isAuth = false;
+        auths.isCreated = false;
+    }
+    console.log('auths',auths);
     dispatch({
-      type: ActionTypes.FETCH_CATEGORIES,
-      payload: auth,
+      type: ActionTypes.SEND_CODE,
+      payload: auths,
     });
   } catch (error) {
     console.log(error);
@@ -25,16 +29,20 @@ export const sendCode = async (dispatch , auth) => {
 
 export const verifyCode = async (dispatch , auth) => {
     try {
+     
       const { data } = await axios.post(apiEndPoint + "/verify-code" , auth);
+
+      console.log("data",data);
+      
+      let auths = {...store.getState().authReducer.auth};
       
       if(data){
-          let auth = {...store.getState().authReducer.auth};
-          auth.isAuth = true;
+          auths.isAuth = true;
       }
-      
+      console.log("auths",auths);
       dispatch({
-        type: ActionTypes.FETCH_CATEGORIES,
-        payload: auth,
+        type: ActionTypes.VERIFY_CODE,
+        payload: auths,
       });
     } catch (error) {
       console.log(error);
@@ -45,18 +53,55 @@ export const reSendCode = async (dispatch , auth) => {
     try {
       const { data } = await axios.post(apiEndPoint + "/re-send-code" , auth);
       
+      console.log("data",data);
+
+      let auths = {...store.getState().authReducer.auth};
+      
       if(data){
-          let auth = {...store.getState().authReducer.auth};
-          auth.request_id = data.request_id;
+          auths.request_id = data.request_id;
+          auths.isAuth = false;
+          auths.isCreated = false;
+          auths.code = '';
       }
+
+      console.log("auths",auths);
       
       dispatch({
-        type: ActionTypes.FETCH_CATEGORIES,
-        payload: auth,
+        type: ActionTypes.RESEND_CODE,
+        payload: auths,
       });
     } catch (error) {
       console.log(error);
     }
+};
+
+export const saveCustomer = async (dispatch , auth) => {
+  try {
+
+    const { data } = await axios.post(apiEndPoint + "/" , auth);
+    
+    console.log("data",data);
+
+    console.log("auth",auth);
+
+    let auths = {...store.getState().authReducer.auth};
+    
+    if(data){
+
+        auths.isAuth = true;
+        auths.isCreated = true;
+        auths.code = '';
+    }
+
+    console.log("auths",auths);
+    
+    dispatch({
+      type: ActionTypes.RESEND_CODE,
+      payload: auths,
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const handleTextChangeNumber = (dispatch, e) => {
@@ -71,10 +116,20 @@ export const handleTextChangeNumber = (dispatch, e) => {
 
 export const handleTextChangeCode = (dispatch, e) => {
     let auth = {...store.getState().authReducer.auth};
-    auth.phoneNumber = e;
+    auth.code = e;
     console.log('sfkjsfs',auth,e);
     dispatch({
       type: ActionTypes.HANDLE_TEXT_CHANGE_CODE,
       payload: auth,
     });
+};
+
+export const handleTextChangeName = (dispatch, e) => {
+  let auth = {...store.getState().authReducer.auth};
+  auth.nameCustomer = e;
+  console.log('sfkjsfs',auth,e);
+  dispatch({
+    type: ActionTypes.HANDLE_TEXT_CHANGE_NAME,
+    payload: auth,
+  });
 };
