@@ -5,7 +5,9 @@ let initialState = {
         phoneNumber:'92',
         request_id:'',
         code:'',
-        isAuth:''
+        isAuth:false,
+        isCreated:false,
+        nameCustomer:'',
     }
 };
 
@@ -21,6 +23,10 @@ export const authReducer = (state = initialState, action) => {
       return { ...state, auth: action.payload };
     case ActionTypes.HANDLE_TEXT_CHANGE_CODE:
         return { ...state, auth: action.payload };
+    case ActionTypes.HANDLE_TEXT_CHANGE_NAME:
+      return { ...state, auth: action.payload };
+    case ActionTypes.SAVE_CUSTOMER:
+      return { ...state, auth: action.payload };
     default:
       return state;
   }
