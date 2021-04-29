@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -20,15 +20,15 @@ const { StatusBarManager } = NativeModules;
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
 import Icon from "../components/Icon";
+import { fetchServices } from './../redux/actions/serviceActions';
 
 const { width, height } = Dimensions.get("window");
 
 
-class Home extends Component {
-  state = {
-    active: "Products",
-    categories: [],
-    carousel: [
+function Home(props) {
+ 
+    const [active, setActive]  = useState("Products")
+    const [carousel, setCarousel] = useState( [
         {
             id: "1",
             image: require("../assets/images/carousel1.png")
@@ -41,63 +41,60 @@ class Home extends Component {
             id: "3",
             image: require("../assets/images/carousel3.png")
         },
-    ]
-  };
-  scrollX = new Animated.Value(0);
+    ])
+  
+  let scrollX = new Animated.Value(0);
 
-  componentDidMount() {
-    this.props.fetchCategories();
-  }
+  useEffect(() => {
 
-  renderCarousel() {
-    const { carousel } = this.state;
+    props.fetchCategories();
+    props.fetchServices();
+    
+  }, []);
+
+  const renderCarousel = () => {
+  
     return (
-      <FlatList
+    
+        <FlatList
         horizontal
         pagingEnabled
         scrollEnabled
         showsHorizontalScrollIndicator={false}
-        scrollEventThrottle={16}
-        snapToAlignment="center"
         data={carousel}
-        extraDate={this.state}
         keyExtractor={(item, index) => `${item.id}`}
         renderItem={({ item }) => (
 
-            <Block middle >
+            <Block middle center >
               <Image
                 source={item.image}
                 resizeMode="contain"
-                style={{ width, height: height / 2, overflow: "visible" }}
+                style={{ width: width - theme.sizes.base * 2, height: height / 2, overflow: "visible", borderRadius: 12}}
               />
             </Block>
   
         )}
         onScroll={Animated.event([
           {
-            nativeEvent: { contentOffset: { x: this.scrollX } }
+            nativeEvent: { contentOffset: { x: scrollX } }
           },
         ],
         {useNativeDriver: false})}
       />
+  
     );
   }
 
 
 
-  render() {
-    const { profile, navigation } = this.props;
-    const { categories } = this.props;
+    const { profile, navigation } = props;
+    const { categories } = props;
     const tabs = ["Products", "Inspirations", "Shop"];
     return (
-      <Block color={theme.colors.gray2}>
-        <Block flex={false} row  space="between" style={styles.header}>
-          <Block flex={8} bottom>
-          {/* <Image
-                source={require('../assets/images/icon.jpg')}
-                resizeMode="contain"
-                style={{ width : 50, height: 50, overflow: "visible" }}
-              /> */}
+      <Block flex={1} color={theme.colors.gray2}>
+        <Block flex={1} row space="between" color={theme.colors.white} style={styles.header}>
+          <Block flex={8} middle>
+
             <Text h1 accent bold>
                 <Text h1 accent>
                 Parlor{" "}
@@ -106,7 +103,7 @@ class Home extends Component {
             </Text>
             
           </Block>
-          <Block flex={2} row middle>
+          <Block flex={2} row center>
             <Icon
                 name={'location-pin'}
                 type={ 'entypo'}
@@ -119,15 +116,18 @@ class Home extends Component {
 
         
 
-        {this.renderCarousel()}
-        <Block padding={15}>
-            <Text center size={20} bold>CATEGORIES</Text>
+        <Block color={theme.colors.white} flex={4} style={{paddingHorizontal: theme.sizes.base, }}>
+          {renderCarousel()}
         </Block>
+        <Block flex={0.5} padding={15} color={theme.colors.white}>
+            <Text center size={20} accent bold>CATEGORIES</Text>
+        </Block>
+        <Block flex={5} color={theme.colors.white} style={{marginBottom: theme.sizes.base *1.5}}>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{ marginVertical: theme.sizes.base * 1.5,  paddingVertical: theme.sizes.base * 0.5,  }}
+          style={{ marginBottom: theme.sizes.base * 1.5,  paddingVertical: theme.sizes.base * 0.5,  }}
         >
-          <Block flex={false} row space="between" style={styles.categories}>
+          <Block row space="between" style={styles.categories}>
             {categories.map(category => (
               <TouchableOpacity
                 key={category._id}
@@ -145,28 +145,34 @@ class Home extends Component {
                         width: 200
                     }}/>
                   </Badge>
-                  <Text medium height={20}>
+                  <Text medium accent bold height={25} style={{fontWeight: 'bold'}}>
                     {category.name}
                   </Text>
                   <Text gray caption>
-                    12 Services
+                    {
+                      props.services.filter(ser => ser.category._id == category._id).length
+                    }
+                    {" "}services
                   </Text>
                 </Card>
               </TouchableOpacity>
             ))}
           </Block>
         </ScrollView>
+        </Block>
       </Block>
     );
-  }
+  
 }
 
 const mapStateToProps = (state) => ({
-  categories: state.categoryReducer.categories
+  categories: state.categoryReducer.categories,
+  services: state.serviceReducer.services
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  fetchCategories: () => fetchCategories(dispatch)
+  fetchCategories: () => fetchCategories(dispatch),
+  fetchServices: () => fetchServices(dispatch)
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
@@ -198,7 +204,6 @@ const styles = StyleSheet.create({
   categories: {
     flexWrap: "wrap",
     paddingHorizontal: theme.sizes.base * 2,
-    marginBottom: theme.sizes.base * 3.5
   },
   category: {
     // this should be dynamic based on screen width

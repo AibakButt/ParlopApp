@@ -33,12 +33,12 @@ export default function App() {
   return (
       <Provider store={store}>
         <NavigationContainer>
-          {
-          isFirstTime
+          {/* {
+          !isFirstTime
           ? <Register/>
           : <MyTabs />
-          }
-          {/* <ScheduleOrder/> */}
+          } */}
+          <ScheduleOrder/>
         </NavigationContainer>
       </Provider>
   );
