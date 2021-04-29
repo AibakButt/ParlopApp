@@ -11,7 +11,7 @@ import {
 import { connect } from "react-redux";
 import { fetchCategories } from "./../redux/actions/categoryActions";
 import { fetchServices } from './../redux/actions/serviceActions';
-import {  addToCart } from './../redux/actions/cartActions';
+import {  addToCart , addAddOns} from './../redux/actions/cartActions';
 import { Card, Badge, Button, Block, Text } from "../components";
 import Modal from 'react-native-modal';
 import { theme, mocks } from "../constants";
@@ -138,6 +138,11 @@ function Services(props) {
     props.addToCart(service);
   }
 
+  const addAddonsToServiceToCart = (addon, serviceId) => {
+    console.log("asdafsa",addon,serviceId)
+    props.addAddOns(addon,serviceId);
+  }
+
   const isAlreadyInCart = (serviceId) => {
     let already = false;
      if(props.cartServices && props.cartServices.length>0) {
@@ -209,9 +214,9 @@ function Services(props) {
                   style={{margintop:30}}
             >
             {
-              addons.map(addon => (
+              addons.map((addon,index) => (
                           
-                      <Block color="white" row key={addon._id} shadow style={styles.service}>
+                      <Block color="white" row key={index} shadow style={styles.service}>
                         <Block flex={8}>
                           <Text medium height={20} size={18}>
                               {addon.name}
@@ -226,6 +231,7 @@ function Services(props) {
                                 name={'plus'}
                                 type="materialCommunity"
                                 size={22}
+                                onPress={() => addAddonsToServiceToCart({name:addon.name,price:addon.price,quantity:1},ser_id)}
                                 color={theme.colors.accent}
                               />
                               
@@ -320,6 +326,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
   fetchCategories: () => fetchCategories(dispatch),
   fetchServices: () => fetchServices(dispatch),
+  addAddOns: (addons, serviceId) => addAddOns(dispatch,addons,serviceId),
   addToCart: (service) => addToCart(dispatch,service),
 });
 
