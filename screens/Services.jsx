@@ -83,7 +83,6 @@ function Services(props) {
           }
        });
       }
-
       return already;
   }
 
@@ -182,7 +181,7 @@ function Services(props) {
                 style={{margintop:30}}
                 >
                
-                    {myservices.filter(ser => ser.category._id === active._id).map(service => (
+                    {services.filter(ser => ser.category._id === active._id).map(service => (
                         
                         <Block color="white" key={service._id} shadow style={styles.service}>
                             {renderAddonModal(service.addons)}

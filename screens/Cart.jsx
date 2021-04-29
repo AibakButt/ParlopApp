@@ -43,8 +43,8 @@ const Cart = (props) => {
                         style={{margintop:30}}
                     >
                         {
-                            cartService.map( service => (
-                                <Block>
+                            cartService.map( (service ,index)=> (
+                                <Block key={index}>
                                     <Block row >
                                         <Block flex={8} >
                                             <Block padding={theme.sizes.base} space="around">

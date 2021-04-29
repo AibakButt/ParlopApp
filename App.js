@@ -34,7 +34,7 @@ export default function App() {
       <Provider store={store}>
         <NavigationContainer>
           {
-          isFirstTime
+          !isFirstTime
           ? <Register/>
           : <MyTabs />
           }
