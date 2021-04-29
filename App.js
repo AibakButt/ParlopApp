@@ -38,7 +38,7 @@ export default function App() {
           ? <Register/>
           : <MyTabs />
           }
-          {/* <ScheduleOrder/> */}
+          <ScheduleOrder/>
         </NavigationContainer>
       </Provider>
   );

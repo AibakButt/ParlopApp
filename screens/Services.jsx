@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   FlatList,
+  ImageBackground
 } from "react-native";
 import { connect } from "react-redux";
 import { fetchCategories } from "./../redux/actions/categoryActions";
@@ -39,12 +40,75 @@ const myservices = [{
     { name: "Extra 3 ", price: 500},
   ],
  
-},]
+},{
+  _id: "6080576ea9b0a300042f7609",
+  name: "Acne facial 2 ",
+  category: {
+      _id: "6080570ca9b0a300042f7602",
+      name: "Facial",
+      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
+      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
+      created_at: "2021-04-21T16:47:08.090Z",
+      updatedAt: "2021-04-21T16:47:08.090Z"
+   
+  },
+  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
+  price: 500,
+  availability: true,
+  addons: [
+    { name: "Extra 4 ", price: 200},
+    { name: "Extra 5 ", price: 300},
+    { name: "Extra 6 ", price: 500},
+  ],
+ 
+},{
+  _id: "6080576ea9b0a300042f7609",
+  name: "Acne facial 2 ",
+  category: {
+      _id: "6080570ca9b0a300042f7602",
+      name: "Facial",
+      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
+      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
+      created_at: "2021-04-21T16:47:08.090Z",
+      updatedAt: "2021-04-21T16:47:08.090Z"
+   
+  },
+  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
+  price: 500,
+  availability: true,
+  addons: [
+    { name: "Extra 4 ", price: 200},
+    { name: "Extra 5 ", price: 300},
+    { name: "Extra 6 ", price: 500},
+  ],
+ 
+},{
+  _id: "6080576ea9b0a300042f7609",
+  name: "Acne facial 2 ",
+  category: {
+      _id: "6080570ca9b0a300042f7602",
+      name: "Facial",
+      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
+      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
+      created_at: "2021-04-21T16:47:08.090Z",
+      updatedAt: "2021-04-21T16:47:08.090Z"
+   
+  },
+  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
+  price: 500,
+  availability: true,
+  addons: [
+    { name: "Extra 4 ", price: 200},
+    { name: "Extra 5 ", price: 300},
+    { name: "Extra 6 ", price: 500},
+  ],
+ 
+}]
 
 function Services(props) {
   
   const [active, setActive] = useState(props.route.params)
-  const [modalShow, setModalShow] = useState(false)
+  const [modalShow, setModalShow] = useState(null)
 
   useEffect(() => {
 
@@ -63,7 +127,7 @@ function Services(props) {
         onPress={() => setActive(tab)}
         style={[styles.tab, isActive ? styles.active : null]}
       >
-        <Text size={16} medium gray={!isActive} secondary={isActive}>
+        <Text size={16}  accent={isActive}>
           {tab.name}
         </Text>
       </TouchableOpacity>
@@ -89,28 +153,55 @@ function Services(props) {
  
   
   
-  const renderAddonModal = (addons) => {
+  const renderAddonModal = (addons, ser_id) => {
+    if(addons.length === 0 ){
+      return(
+        <Modal
+          transparent={true}
+          isVisible={modalShow === ser_id}
+          style={styles.modalView}
+        > 
+        <Block flex={false} center middle row sapce="between" padding={theme.sizes.base} style={{borderBottomColor: theme.colors.gray2, borderBottomWidth: 1}}>
+              <Block flex={7} center >
+                <Text h1 >Addons</Text>
+              </Block>
+              <Block>
+                <Icon
+                    name="close"
+                    color={theme.colors.accent}
+                    backgroundColor="white"
+                    onPress={() => setModalShow(null)}
+                    size={22}
+                  /> 
+              </Block>
+              </Block>
+            <Block center middle flex={1} color={theme.colors.white}> 
+                <Image source={require('../assets/images/no-addon.jpg')} style={{width: 70, height: 70}} />
+                <Text gray center size={16} style={{padding: theme.sizes.base}}>No addon for this service</Text>
+            </Block>
+        </Modal>
+      )
+    }
     return (
         <Modal
           transparent={true}
-          isVisible={modalShow}
+          isVisible={modalShow === ser_id}
           style={styles.modalView}
         > 
         
-            <Block center middle row >
-              <Text h1 >Add Ons</Text>
-              
-            
-                <Icon.Button
-                  name="close"
-                  color="black"
-                  backgroundColor="white"
-                  onPress={() => setModalShow(!modalShow)}
-                  
-                />
-            
-          
-              
+            <Block flex={false} center middle row sapce="between" padding={theme.sizes.base} style={{borderBottomColor: theme.colors.gray2, borderBottomWidth: 1}}>
+              <Block flex={7} center >
+                <Text h1 >Addons</Text>
+              </Block>
+              <Block>
+                <Icon
+                    name="close"
+                    color={theme.colors.accent}
+                    backgroundColor="white"
+                    onPress={() => setModalShow(null)}
+                    size={22}
+                  /> 
+              </Block>
               
             </Block>
             <ScrollView
@@ -122,24 +213,22 @@ function Services(props) {
                           
                       <Block color="white" row key={addon._id} shadow style={styles.service}>
                         <Block flex={8}>
-                          <Text medium height={20} size={20}>
+                          <Text medium height={20} size={18}>
                               {addon.name}
                           </Text>
-                          <Text primary size={17} style={{paddingVertical: 10}}>
+                          <Text accent size={15} style={{paddingVertical: 5}}>
                                   Rs. {addon.price}
                               </Text>
                           </Block>
                           <Block flex={2} center middle>
                             <TouchableOpacity style={styles.actionButton} onPress={() => {}}>
                               <Icon
-                                name={'heart-outline'}
+                                name={'plus'}
                                 type="materialCommunity"
                                 size={22}
-                                color={theme.colors.white}
+                                color={theme.colors.accent}
                               />
-                              <Text numberOfLines={1} style={styles.actionText}>
-                                Favorite
-                              </Text>
+                              
                             </TouchableOpacity>
                           </Block>
                       </Block>
@@ -157,7 +246,10 @@ function Services(props) {
     const {categories, services} = props;
     return (
         <Block>
-          
+          <ImageBackground
+           source={{uri: active.picture}}
+           style={{width: width, height: height/3}}
+           >
             <Block flex={false} margin={10}>
                 <FlatList
                     horizontal
@@ -169,11 +261,7 @@ function Services(props) {
                 
                 />
             </Block>
-            <Block flex={false}>
-                {
-                  <Image source={{uri: active.image}} style={{width: width, height: height/4}} /> 
-                }
-            </Block>
+            </ImageBackground>
             <Block color={theme.colors.white} style={styles.servicesScrollView}>
               <ScrollView
                 showsVerticalScrollIndicator={false}
@@ -184,16 +272,16 @@ function Services(props) {
                     {services.filter(ser => ser.category._id === active._id).map(service => (
                         
                         <Block color="white" key={service._id} shadow style={styles.service}>
-                            {renderAddonModal(service.addons)}
+                            {renderAddonModal(service.addons, service._id)}
                            
-                            <Text medium height={20} size={20}>
+                            <Text medium height={20} size={18}>
                                 {service.name}
                             </Text>
                             <Block row space="between" >
-                                <Text bold size={17} style={{paddingVertical: 10}}>
+                                <Text bold accent size={17} style={{paddingVertical: 10}}>
                                     Rs. {service.price}
                                 </Text>
-                                <Button style={{paddingBottom:20}} onPress={() => setModalShow(true)}>
+                                <Button style={{paddingBottom:20}} onPress={() => setModalShow(service._id)}>
                                     <Text center accent>add-ons</Text>
                                 </Button>
                                 {/* <Button color={(!isAlreadyInCart(service._id))?theme.colors.gray2:theme.colors.primary} 
@@ -206,7 +294,7 @@ function Services(props) {
                                     name={isAlreadyInCart(service._id) ? 'done':'plus'}
                                     type={isAlreadyInCart(service._id) ? 'material': 'materialCommunity'}
                                     size={22}
-                                    color={isAlreadyInCart(service._id) ? theme.colors.secondary: theme.colors.black}
+                                    color={theme.colors.accent}
                                   />
                                   
                                 </TouchableOpacity>
@@ -239,7 +327,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(Services);
 
 const styles = StyleSheet.create({
   centeredView: {
-   
     position: "absolute",
     top: 10
   },
@@ -268,9 +355,11 @@ const styles = StyleSheet.create({
   service: {
     // this should be dynamic based on screen width
     padding: theme.sizes.base,
+    paddingLeft: theme.sizes.base * 1.5,
     borderBottomColor: theme.colors.gray2,
     borderBottomWidth: 1,
-    marginBottom: theme.sizes.base & 0.5
+    marginBottom: theme.sizes.base & 0.5,
+    elevation: 10
   },
   servicesScrollView: {
       marginTop: -30,
