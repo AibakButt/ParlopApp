@@ -1,12 +1,9 @@
 import React, { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
-import MyTabs from './navigation/index';
-import MyStack from './navigation/index';
+import AppStackScreens from './navigation/index';
 import { Provider } from 'react-redux';
 import store from './redux/index';
-import Register from './screens/Register';
-import ScheduleOrder from './screens/ScheduleOrder';
 
 export default function App() {
 
@@ -38,7 +35,7 @@ export default function App() {
           ? <Register/>
           : <MyTabs />
           } */}
-          <ScheduleOrder/>
+          <AppStackScreens/>
         </NavigationContainer>
       </Provider>
   );

@@ -44,7 +44,7 @@ const Menu = (props) => {
                             <Text style={{paddingLeft: 12}} size={18}>Play Intro</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem}>
+                       <TouchableOpacity style={styles.menuItem} onPress={()=>props.navigation.navigate("Coupons")}>
                             <Block row>
                             <Icon
                                 name={'pricetag'}
@@ -66,18 +66,18 @@ const Menu = (props) => {
                             <Text style={{paddingLeft: 12}} size={18}>FAQ's</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem}>
+                       <TouchableOpacity style={styles.menuItem} onPress={()=>props.navigation.navigate("Settings")}> 
                             <Block row>
-                            <Icon
-                                name={'settings'}
-                                type={'feather'}
-                                size={22}
-                                color={theme.colors.accent}
-                            />
-                            <Text style={{paddingLeft: 12}} size={18}>Settings</Text>
+                                <Icon
+                                    name={'settings'}
+                                    type={'feather'}
+                                    size={22}
+                                    color={theme.colors.accent}
+                                />
+                                <Text style={{paddingLeft: 12}} size={18}>Settings</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem}>
+                       <TouchableOpacity style={styles.menuItem} onPress={() => props.navigation.navigate("ContactUs")}>
                             <Block row>
                             <Icon
                                 name={'phone'}

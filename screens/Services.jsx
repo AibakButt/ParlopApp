@@ -134,23 +134,6 @@ function Services(props) {
     );
   }
 
-  const addServiceToCart = (service) => {
-    props.addToCart(service);
-  }
-
-  const isAlreadyInCart = (serviceId) => {
-    let already = false;
-     if(props.cartServices && props.cartServices.length>0) {
-       props.cartServices.forEach(ser => {
-          if(ser._id === serviceId){
-            already=true;
-          }
-       });
-      }
-
-      return already;
-  }
-
  
   
   
@@ -244,7 +227,7 @@ function Services(props) {
   }
 
   
-    const {categories, services} = props;
+    const {categories, services, cartServices} = props;
     return (
         <Block>
           <ImageBackground
@@ -285,15 +268,11 @@ function Services(props) {
                                 <Button style={{paddingBottom:20}} onPress={() => setModalShow(service._id)}>
                                     <Text center accent>add-ons</Text>
                                 </Button>
-                                {/* <Button color={(!isAlreadyInCart(service._id))?theme.colors.gray2:theme.colors.primary} 
-                                  disabled={isAlreadyInCart(service._id)}
-                                  onPress={() => addServiceToCart(service)}>
-                                    <Text style={{ padding:20}} bold size={20}>{(!isAlreadyInCart(service._id))?'+':'added'}</Text>
-                                </Button> */}
-                                <TouchableOpacity style={styles.actionButton} disabled={isAlreadyInCart(service._id)} onPress={() => addServiceToCart(service)}>
+                              
+                                <TouchableOpacity style={styles.actionButton} disabled={cartServices.find(s=> s._id === service._id)} onPress={() => props.addToCart(service)}>
                                   <Icon
-                                    name={isAlreadyInCart(service._id) ? 'done':'plus'}
-                                    type={isAlreadyInCart(service._id) ? 'material': 'materialCommunity'}
+                                    name={cartServices.find(s=> s._id === service._id) ? 'done':'plus'}
+                                    type={cartServices.find(s=> s._id === service._id) ? 'material': 'materialCommunity'}
                                     size={22}
                                     color={theme.colors.accent}
                                   />
