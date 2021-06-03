@@ -11,36 +11,6 @@ import { endServiceTime, startServiceTime, fetchOrders } from './../redux/action
 
 const { StatusBarManager } = NativeModules;
 
-const bookings = [{
-    orderNo: 'RS1325',
-    date: new Date().toDateString(),
-    time: new Date().getHours(),
-    services: [{
-        category: {
-             name: 'Facial'
-        },
-        name: "Face Facial",
-        price: 500,
-        quantity: 10,
-        addons: [{name: 'herbal oil', price: 100 , quantity: 10}]
-    }],
-    employee: {
-        name: "Sana",
-        profilePicture: require('../assets/images/gift.png'),
-        email: 'aibak.butt113@gmail.com',
-        phone: '03054876104'
-    },
-    status: "Pending",
-    customer: {
-        name: "Aibak"
-    },
-    start_time: new Date(),
-    end_time: new Date(),
-    address: 'Kashmir Road, Wahdat Colony, Lahore',
-    orderTotal: 5000
-
-}]
-
 const Bookings = (props) => {
 
     useEffect(() => {
@@ -69,7 +39,7 @@ const Bookings = (props) => {
                         /> 
                     </Block>
                     <Block center>
-                        <Image source={booking.employee.profilePicture} style={{width: 100, height: 100, borderRadius: 50}} />
+                        <Image source={{uri: booking.employee.profilePicture}} style={{width: 100, height: 100, borderRadius: 50}} />
                     </Block>
                     <Block center>
                         <Text>{booking.employee.name}</Text>
@@ -144,11 +114,11 @@ const Bookings = (props) => {
         return (
             
                     <Block key={booking.code} color={theme.colors.white} padding={theme.sizes.base} margin={[theme.sizes.base * 0.5,theme.sizes.base,theme.sizes.base*0.5,theme.sizes.base]} style={{borderRadius: 12}}>
-                        {renderEmployeeData(booking)}
+                        {booking && booking.employee && renderEmployeeData(booking)}
                         <Block row space="between">
                             <Block>
                                 <Text size={17} bold>Order No. {booking.orderNo}</Text>
-                                <Text size={12} >Order Date. {booking.date + " at " + booking.time}</Text>
+                                <Text size={12} >Order Date. {new Date(booking.date).toLocaleDateString() + " at " + new Date(booking.time).toLocaleDateString()}</Text>
                             
                             </Block>
                             
@@ -237,8 +207,10 @@ const Bookings = (props) => {
                 </Block>
             )       
         }
-        <Block style={{ flex: 1, backgroundColor: '#673ab7' }} />
-      };
+        return (
+            <Block style={{ flex: 1, backgroundColor: '#673ab7' }} />
+        )    
+    };
 
     const renderScene = SceneMap({
         active: ActiveBookings,

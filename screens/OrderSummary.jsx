@@ -149,13 +149,29 @@ function OrderSummary (props) {
                     }
                </Block>
                <Block>
-                   <Text bold size={16} style={{padding: theme.sizes.base, paddingTop:0, paddingBottom:0}}>Apply Coupon Code</Text>
-                    <Block style={{backgroundColor: 'white' ,borderRadius: 12}} margin={theme.sizes.base} center>
-                        <Image source={require('../assets/images/gift.png') } style={{width: 100, height: 100, marginTop: theme.sizes.body}}/>
-                        {
-                            renderApplyCoupon()
-                        }
-                    </Block>    
+                   {
+                       order.coupon ? (
+                           <Block style={{backgroundColor: 'white' ,borderRadius: 12}} padding={theme.sizes.body} margin={theme.sizes.base} >
+                                <Block row space="around">
+                                    <Text >Coupon Used:</Text>
+                                    <Text bold>{order.coupon}</Text>
+                                </Block>
+                                {
+                                    renderApplyCoupon()
+                                }
+                           </Block>
+                       ) : (
+                        <>
+                            <Text bold size={16} style={{padding: theme.sizes.base, paddingTop:0, paddingBottom:0}}>Apply Coupon Code</Text>
+                            <Block style={{backgroundColor: 'white' ,borderRadius: 12}} margin={theme.sizes.base} center>
+                                <Image source={require('../assets/images/gift.png') } style={{width: 100, height: 100, marginTop: theme.sizes.body}}/>
+                                {
+                                    renderApplyCoupon()
+                                }
+                            </Block> 
+                        </> 
+                       )
+                   }  
                </Block>
 
                <Block color={theme.colors.white} margin={theme.sizes.base} styles={{borderRadius: 12}}>
