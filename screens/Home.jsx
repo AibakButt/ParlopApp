@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   FlatList,
   Animated,
-  StatusBar,
+  Modal,
   NativeModules
 } from "react-native";
 import { connect } from "react-redux";
@@ -15,42 +15,41 @@ import {
   fetchCategories,
 } from "./../redux/actions/categoryActions";
 const { StatusBarManager } = NativeModules;
+import RNPickerSelect from 'react-native-picker-select';
 
 
 import { Card, Badge, Button, Block, Text } from "../components";
 import { theme, mocks } from "../constants";
 import Icon from "../components/Icon";
 import { fetchServices } from './../redux/actions/serviceActions';
+import { fetchDealImages } from './../redux/actions/dealImagesActions';
 
 const { width, height } = Dimensions.get("window");
 
 
 function Home(props) {
  
-    const [active, setActive]  = useState("Products")
-    const [carousel, setCarousel] = useState( [
-        {
-            id: "1",
-            image: require("../assets/images/carousel1.png")
-        },
-        {
-            id: "2",
-            image: require("../assets/images/carousel2.png")
-        },
-        {
-            id: "3",
-            image: require("../assets/images/carousel3.png")
-        },
-    ])
-  
+  const [active, setActive]  = useState("Products")
+  const [city, setCity] = useState("lahore");
+
+  const handleCitySelect = (value) => {
+    if(value !== "lahore"){
+      alert("Sorry! our services are currently available in Lahore")
+      setCity("Lahore")
+    }
+  }
+    
   let scrollX = new Animated.Value(0);
 
   useEffect(() => {
 
     props.fetchCategories();
     props.fetchServices();
+    props.fetchDealImages();
     
   }, []);
+
+ 
 
   const renderCarousel = () => {
   
@@ -61,13 +60,14 @@ function Home(props) {
         pagingEnabled
         scrollEnabled
         showsHorizontalScrollIndicator={false}
-        data={carousel}
-        keyExtractor={(item, index) => `${item.id}`}
+        data={props.dealImages}
+        keyExtractor={(item, index) => `${index}`}
         renderItem={({ item }) => (
 
             <Block middle center >
+              {console.log(item)}
               <Image
-                source={item.image}
+                source={{ uri: item.image}}
                 resizeMode="contain"
                 style={{ width: width - theme.sizes.base * 2, height: height / 2, overflow: "visible", borderRadius: 12}}
               />
@@ -93,7 +93,7 @@ function Home(props) {
     return (
       <Block flex={1} color={theme.colors.gray2}>
         <Block flex={1} row space="between" color={theme.colors.white} style={styles.header}>
-          <Block flex={8} middle>
+          <Block flex={7} middle>
 
             <Text h1 accent bold>
                 <Text h1 accent>
@@ -103,14 +103,34 @@ function Home(props) {
             </Text>
             
           </Block>
-          <Block flex={2} row center>
-            <Icon
-                name={'location-pin'}
-                type={ 'entypo'}
-                size={22}
-                color={theme.colors.accent}
-              />
-            <Text gray>Lahore</Text>
+            <Block flex={3} row center>
+                
+                <Block flex={2} right>
+                <Icon
+                    name={'location-pin'}
+                    type={ 'entypo'}
+                    size={20}
+                    color={theme.colors.accent}
+                  />
+                </Block>
+              <Block flex={8} paddingLeft={5}>
+                
+                  <RNPickerSelect
+                  
+                    value={city}
+                    style={{inputAndroid: styles.select, inputIOS: styles.select, }}
+                    useNativeAndroidPickerStyle={false}
+                    onValueChange={(value) => handleCitySelect(value)}
+                    items={[
+                        {label: 'Lahore', value: 'lahore' },
+                        {label: 'Islamabad', value: 'Islamabad' },
+                        {label: 'Rawalpindi', value: 'Rawalpindi' },
+                        {label: 'Karachi', value: 'Karachi' },
+                    ]}
+                  />
+
+                </Block>
+          
           </Block>
         </Block>
 
@@ -167,12 +187,14 @@ function Home(props) {
 
 const mapStateToProps = (state) => ({
   categories: state.categoryReducer.categories,
-  services: state.serviceReducer.services
+  services: state.serviceReducer.services,
+  dealImages: state.dealImagesReducer.dealImages
 });
 
 const mapDispatchToProps = (dispatch) => ({
   fetchCategories: () => fetchCategories(dispatch),
-  fetchServices: () => fetchServices(dispatch)
+  fetchServices: () => fetchServices(dispatch),
+  fetchDealImages: () => fetchDealImages(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
@@ -210,5 +232,12 @@ const styles = StyleSheet.create({
     minWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxWidth: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2,
     maxHeight: (width - theme.sizes.padding * 2.4 - theme.sizes.base) / 2
-  }
+  },
+  select:{
+    backgroundColor: theme.colors.white,
+    height: theme.sizes.base * 3,
+    color: theme.colors.accent,
+    fontWeight: "bold"
+   
+},
 });

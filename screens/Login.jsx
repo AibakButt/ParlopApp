@@ -5,11 +5,10 @@ import { TapGestureHandler, State, TouchableWithoutFeedback } from 'react-native
 import Icon from '../components/Icon';
 import { connect } from "react-redux";
 import {  
-  handleTextChange,
-  sendPhoneNo, 
+  handleTextChange, 
   resendCode,
-  sendVerificationCode,
-  registerCustomer,
+  sendPhoneNoLogin,
+  sendVerificationCodeAndLogin,
 } from './../redux/actions/authentication';
 
 import { theme } from '../constants';
@@ -68,7 +67,6 @@ class Register extends Component {
 
     this.state = {
         codeFeildShow: false,
-        nameShow: false,
         showLoading: false
     }
 
@@ -139,7 +137,7 @@ class Register extends Component {
   sendPhoneNo = async () => {
     try {
       this.setState({showLoading: true})
-      await this.props.sendPhoneNo()
+      await this.props.sendPhoneNoLogin()
       this.setState({showLoading: false, codeFeildShow: true})
     } catch (error) {
       this.setState({showLoading: false})
@@ -153,7 +151,7 @@ class Register extends Component {
 
     try {
       this.setState({showLoading: true})
-      await this.props.sendVerificationCode()
+      await this.props.sendVerificationCodeAndLogin()
       this.setState({showLoading: false, nameShow: true})
     } catch (error) {
       this.setState({showLoading: false})
@@ -205,8 +203,8 @@ class Register extends Component {
             </TouchableOpacity>
         </Block>
         <Block center middle>
-          <TouchableOpacity onPress={() => this.props.navigation.navigate("Login")}> 
-            <Text gray size={12} style={{textDecorationLine: 'underline'}}>Already Have an account?</Text>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate("Register")}>
+            <Text gray size={12} style={{textDecorationLine: 'underline'}}>Dont have an account?</Text>
           </TouchableOpacity>
         </Block>
       </Block>
@@ -247,35 +245,6 @@ class Register extends Component {
     )
   }
 
-  renderNameInput = () => {
-    return (
-      <Block>
-          <TextInput
-              placeholder="Your Name"
-              value={this.props.auth.nameCustomer}
-              onChangeText={(e) => this.props.handleTextChange(e,"name")}
-              style={styles.textInput}
-          />
-          <Block row middle marginTop={theme.sizes.base}>
-              <Block>
-                  <TouchableOpacity style={styles.next} onPress={() => this.registerCustomer()}>
-                  {
-                    this.state.showLoading ? (
-                      <ActivityIndicator size="small" color={theme.colors.white} />
-                      ) : (
-                      <Text bold white>
-                          Register
-                      </Text>
-                    )
-                  }
-                  </TouchableOpacity>
-              </Block>
-              
-          </Block>
-      </Block>
-    )
-  }
-
   render() {
     return (
       <KeyboardAvoidingView
@@ -309,7 +278,7 @@ class Register extends Component {
                 transform: [{ translateY: this.buttonY }]
               }}
             >
-              <Text white bold >Register</Text>
+              <Text white bold >Login</Text>
             </Animated.View>
           </TapGestureHandler>
           
@@ -331,15 +300,11 @@ class Register extends Component {
                     </TapGestureHandler>
             
             {
-                this.state.nameShow ? (
-                    this.renderNameInput()
-                ) : (
-                    this.state.codeFeildShow ? (
-                        this.renderCodeInput()
-                      ) : (
-                        this.renderPhoneInput()
-                      )
-                )
+                this.state.codeFeildShow ? (
+                    this.renderCodeInput()
+                    ) : (
+                    this.renderPhoneInput()
+                    )
             }
             
             
@@ -360,10 +325,9 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   handleTextChange: (value, field) => handleTextChange(dispatch, value, field),
-  sendPhoneNo: () => sendPhoneNo(dispatch),
-  sendVerificationCode: () => sendVerificationCode(dispatch),
+  sendPhoneNoLogin: () => sendPhoneNoLogin(dispatch),
+  sendVerificationCodeAndLogin: () => sendVerificationCodeAndLogin(dispatch),
   resendCode: () => resendCode(dispatch),
-  registerCustomer: () => registerCustomer(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);

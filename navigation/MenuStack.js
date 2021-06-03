@@ -6,6 +6,8 @@ import FAQS from './../screens/FAQS';
 import Settings from './../screens/Settings';
 import ContactUs from './../screens/ContactUs';
 import Menu from './../screens/Menu';
+import Register from './../screens/Register';
+import Login from './../screens/Login';
 import { theme } from '../constants';
 
 const MenuStack = createStackNavigator();
@@ -26,6 +28,8 @@ function MenuStackScreens() {
         <MenuStack.Screen name="FAQS" component={FAQS} />
         <MenuStack.Screen name="Settings" component={Settings} options={defaultOptions}/>
         <MenuStack.Screen name="ContactUs" component={ContactUs} options={defaultOptions}/>
+        <MenuStack.Screen name="Register" component={Register} options={defaultOptions}/>
+        <MenuStack.Screen name="Login" component={Login} options={defaultOptions}/>
        </MenuStack.Navigator>
     );
 }

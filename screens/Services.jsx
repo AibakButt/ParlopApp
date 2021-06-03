@@ -134,15 +134,39 @@ function Services(props) {
     );
   }
 
+  const addServiceToCart = (service) => {
+    props.addToCart(service);
+  }
+
+  const addAddonsToServiceToCart = (addon, serviceId) => {
+    console.log("asdafsa",addon,serviceId)
+    props.addAddOns(addon,serviceId);
+  }
+
+  const isAddonInCart = (serviceId, addonName) => {
+    let already = false;
+     if(props.cartServices && props.cartServices.length > 0) {
+       props.cartServices.forEach(ser => {
+          if(ser._id === serviceId){
+            ser.addons.forEach(addon => {
+              if(addon.name === addonName)
+              already = true
+            });
+          }
+       });
+      }
+      return already;
+  }
+
  
   
   
-  const renderAddonModal = (addons, ser_id) => {
-    if(addons.length === 0 ){
+  const renderAddonModal = (service, ser_id) => {
+    if(service.addons.length === 0 ){
       return(
         <Modal
           transparent={true}
-          isVisible={modalShow === ser_id}
+          isVisible={modalShow === service._id}
           style={styles.modalView}
         > 
         <Block flex={false} center middle row sapce="between" padding={theme.sizes.base} style={{borderBottomColor: theme.colors.gray2, borderBottomWidth: 1}}>
@@ -158,7 +182,7 @@ function Services(props) {
                     size={22}
                   /> 
               </Block>
-              </Block>
+            </Block>
             <Block center middle flex={1} color={theme.colors.white}> 
                 <Image source={require('../assets/images/no-addon.jpg')} style={{width: 70, height: 70}} />
                 <Text gray center size={16} style={{padding: theme.sizes.base}}>No addon for this service</Text>
@@ -169,7 +193,7 @@ function Services(props) {
     return (
         <Modal
           transparent={true}
-          isVisible={modalShow === ser_id}
+          isVisible={modalShow === service._id}
           style={styles.modalView}
         > 
         
@@ -193,7 +217,7 @@ function Services(props) {
                   style={{margintop:30}}
             >
             {
-              addons.map((addon,index) => (
+              service.addons.map((addon,index) => (
                           
                       <Block color="white" row key={index} shadow style={styles.service}>
                         <Block flex={8}>
@@ -205,12 +229,11 @@ function Services(props) {
                               </Text>
                           </Block>
                           <Block flex={2} center middle>
-                            <TouchableOpacity style={styles.actionButton} onPress={() => {}}>
+                            <TouchableOpacity style={styles.actionButton} disabled={isAddonInCart(ser_id, addon.name)} onPress={() => addAddonsToServiceToCart({name:addon.name,price:addon.price,quantity:1},ser_id)}>
                               <Icon
-                                name={'plus'}
-                                type="materialCommunity"
+                                name={isAddonInCart(ser_id, addon.name) ? 'done':'plus'}
+                                type={isAddonInCart(ser_id, addon.name)  ? 'material': 'materialCommunity'}
                                 size={22}
-                                onPress={() => addAddonsToServiceToCart({name:addon.name,price:addon.price,quantity:1},ser_id)}
                                 color={theme.colors.accent}
                               />
                               
@@ -257,7 +280,7 @@ function Services(props) {
                     {services.filter(ser => ser.category._id === active._id).map(service => (
                         
                         <Block color="white" key={service._id} shadow style={styles.service}>
-                            {renderAddonModal(service.addons, service._id)}
+                            {renderAddonModal(service, service._id)}
                            
                             <Text medium height={20} size={18}>
                                 {service.name}
@@ -269,11 +292,11 @@ function Services(props) {
                                 <Button style={{paddingBottom:20}} onPress={() => setModalShow(service._id)}>
                                     <Text center accent>add-ons</Text>
                                 </Button>
-                              
-                                <TouchableOpacity style={styles.actionButton} disabled={cartServices.find(s=> s._id === service._id)} onPress={() => props.addToCart(service)}>
+                             
+                                <TouchableOpacity style={styles.actionButton} disabled={cartServices.find(ser => ser._id == service._id)} onPress={() => addServiceToCart(service)}>
                                   <Icon
-                                    name={cartServices.find(s=> s._id === service._id) ? 'done':'plus'}
-                                    type={cartServices.find(s=> s._id === service._id) ? 'material': 'materialCommunity'}
+                                    name={cartServices.find(ser => ser._id == service._id) ? 'done':'plus'}
+                                    type={cartServices.find(ser => ser._id == service._id)  ? 'material': 'materialCommunity'}
                                     size={22}
                                     color={theme.colors.accent}
                                   />
@@ -387,6 +410,6 @@ const styles = StyleSheet.create({
     color: theme.colors.black,
   },
   actionTextStyle: {
-    padding: 40,
+    padding: 40
   },
 });

@@ -3,9 +3,13 @@ import { connect } from 'react-redux'
 import { Block, Text} from '../components'
 import { theme } from '../constants'
 import { StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import DropDownPicker from 'react-native-dropdown-picker';
+import RNPickerSelect from 'react-native-picker-select';
+import { handleTextChange } from './../redux/actions/contactUsActions';
 
 function ContactUs (props) {
+   
+    const { contactUs } = props
+
     return (
         <Block color={theme.colors.gray2}>
             <Block flex={0.9}>
@@ -14,8 +18,9 @@ function ContactUs (props) {
                     <Block>
                         <Text style={styles.text}>Full Name<Text tertiary> *</Text></Text>
                         <TextInput
+                            value={contactUs.fullName}
+                            onChangeText={(value) => props.handleTextChange("fullName",value)}
                             style={styles.textInput}
-                            onChangeText={() => {}}
                             placeholder="Full Name"           
                         />
                     </Block>
@@ -23,13 +28,19 @@ function ContactUs (props) {
                         <Text style={styles.text}>Email<Text tertiary> *</Text></Text>
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={() => {}}
+                            value={contactUs.email}
+                            onChangeText={(value) => props.handleTextChange("email",value)}
                             placeholder="Email"
                         />
                     </Block>
                     <Block>
                         <Text style={styles.text}>Nature of Subject<Text tertiary> *</Text></Text>
-                        <DropDownPicker
+                       
+                         <RNPickerSelect
+                            style={{inputAndroid: styles.select, inputIOS: styles.select, }}
+                            useNativeAndroidPickerStyle={false}
+                            value={contactUs.natureOfSubject}
+                            onValueChange={(value) => props.handleTextChange("natureOfSubject",value)}
                             items={[
                                 {label: 'Complaint', value: 'complaint' },
                                 {label: 'Suggesstion', value: 'suggesstion' },
@@ -37,21 +48,15 @@ function ContactUs (props) {
                                 {label: 'Feature Request', value: 'feature request' },
                                 {label: 'Other', value: 'other' },
                             ]}
-                            defaultValue='complaint'
-                            containerStyle={{ height: 45, zIndex:5}}
-                            style={{...styles.textInput, borderWidth: 0, borderRadius: 12 }}
-                            itemStyle={{
-                                justifyContent: 'flex-start'
-                            }}
-                            dropDownStyle={{backgroundColor: theme.colors.white, marginHorizontal: theme.sizes.base, borderRadius: 12}}
-                            onChangeItem={item => console.log(item)}
+                            
                         />
                     </Block>
                     <Block>
                         <Text style={styles.text}>Subject<Text tertiary> *</Text></Text>
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={() => {}}
+                            value={contactUs.subject}
+                            onChangeText={(value) => props.handleTextChange("subject",value)}
                             placeholder="Subject"
                         />
                     </Block>
@@ -59,7 +64,8 @@ function ContactUs (props) {
                         <Text style={styles.text}>Message<Text tertiary> *</Text></Text>
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={() => {}}
+                            value={contactUs.message}
+                            onChangeText={(value) => props.handleTextChange("message",value)}
                             placeholder="Message"
                             multiline
                             numberOfLines={4}
@@ -81,12 +87,13 @@ function ContactUs (props) {
 }
 
 const mapStateToProps = (state) => ({
-    
+    contactUs: state.contactUsReducer.contactUs
 })
 
-const mapDispatchToProps = {
-    
-}
+
+const mapDispatchToProps = (dispatch) => ({
+    handleTextChange: (field, value) => handleTextChange(dispatch, field, value)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContactUs)
 
@@ -102,11 +109,11 @@ const styles = StyleSheet.create({
     select:{
         marginHorizontal: theme.sizes.base,
         borderRadius: 12,
-        backgroundColor: theme.colors.whtie,
+        backgroundColor: theme.colors.white,
         paddingHorizontal: theme.sizes.base,
-        paddingVertical: theme.sizes.base,
-        fontSize: 18,
-        fontWeight: "600"
+        height: theme.sizes.base * 3,
+        color:  theme.colors.black
+       
     },
   
     textInput:{ 

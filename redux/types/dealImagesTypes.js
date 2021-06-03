@@ -1,0 +1,1 @@
+export const FETCH_DEAL_IMAGES = 'FETCH_DEAL_IMAGES';

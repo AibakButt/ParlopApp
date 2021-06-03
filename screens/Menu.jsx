@@ -1,25 +1,48 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from './../components/index';
 import { StyleSheet, NativeModules, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { theme } from '../constants';
 import { Platform } from 'react-native';
 import Icon from '../components/Icon';
+import { getCurrentCustomer } from '../redux/actions/authentication';
 
 const { StatusBarManager } = NativeModules;
 
 const Menu = (props) => {
+
+    const [customer, setCustomer] = useState(null)
+
+    useEffect( () => {
+
+        const getCustomer = async () => {
+            try {
+                setCustomer(await getCurrentCustomer())
+            } catch (error) {
+                console.log(error)
+            }
+    
+        }
+        
+        getCustomer()
+
+        
+    }, []);
+
+    
+
     return (
         <Block flex={1} style={styles.header}>
+            {console.log("token receivedd...", getCurrentCustomer())}
                 <Block row flex={1.5} color={theme.colors.white} style={{borderRadius:12}} margin={[0,10,0,10]} center middle>
                     <Block style={{paddingHorizontal: 12}} flex={2}>
                         <Image source={require('../assets/images/user.png')} style={styles.logo}/>
                     </Block>
                     <Block flex={6}>
-                        <Text size={22}>Guest User</Text>
+                        <Text size={22}>{customer ? customer.name : "Guest User"}</Text>
                     </Block>
                     <Block flex={2}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => props.navigation.navigate("Login")}>
                             <Text size={12} accent>
                                 Signin / Signup
                             </Text>
