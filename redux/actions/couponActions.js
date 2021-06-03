@@ -3,6 +3,7 @@ import store from "../index";
 import * as ActionTypes from "../types/couponTypes";
 import {UPDATE_ORDER} from "../types/orderTypes";
 import { getCurrentCustomer } from "./authentication";
+import { showMessage, hideMessage } from "react-native-flash-message";
 const apiEndPoint = "https://parlor-server.herokuapp.com/api/customer";
 
 export const fetchCoupons = async (dispatch) => {
@@ -24,7 +25,19 @@ export const applyCoupon = async (dispatch) => {
     let coupon = {...store.getState().couponReducer.coupon};
     
     let couponFound = data.customer.coupons.filter(c => (c.code+'' == coupon.code+'')?true:false)
+    if(couponFound.length===0){
+      showMessage({
+        message: "Coupon Not Found",
+        type: "danger",
+        floating: true
+      });
+      return;
+    }
+
+    
     // console.log("Coupon Found",couponFound, coupon.code)
+
+
     let order = {...store.getState().orderReducer.order};
     
     let couponObj = couponFound && couponFound.length > 0 && couponFound[0]
