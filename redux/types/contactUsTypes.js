@@ -1,0 +1,2 @@
+export const HANDLE_TEXT_CHANGE = "HANDLE_TEXT_CHANGE";
+export const SUBMIT_QUERY = "SUBMIT_QUERY";

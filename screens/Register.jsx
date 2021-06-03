@@ -1,21 +1,19 @@
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Image, Dimensions, TextInput, TouchableOpacity, Keyboard } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { View, StyleSheet, Image, Dimensions, TextInput, TouchableOpacity,ActivityIndicator, Keyboard, Platform, KeyboardAvoidingView } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import { TapGestureHandler, State, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Icon from '../components/Icon';
 import { connect } from "react-redux";
 import {  
-  handleTextChangeNumber,
-  handleTextChangeCode,
-  handleTextChangeName, 
-  sendCode, 
-  reSendCode,
-  verifyCode,
-  saveCustomer,
+  handleTextChange,
+  sendPhoneNo, 
+  resendCode,
+  sendVerificationCode,
+  registerCustomer,
 } from './../redux/actions/authentication';
+
 import { theme } from '../constants';
-import { Block } from '../components';
+import { Block, Text} from '../components';
 const { width, height } = Dimensions.get('window');
 
 const {
@@ -71,6 +69,7 @@ class Register extends Component {
     this.state = {
         codeFeildShow: false,
         nameShow: false,
+        showLoading: false
     }
 
     this.buttonOpacity = new Value(1);
@@ -137,56 +136,152 @@ class Register extends Component {
 
   }
 
-  sendCode = async () =>{
-
-    this.setState({codeFeildShow: true})
-    const storeData = async () => {
-      try {
-        await AsyncStorage.setItem('isFirstTime', false);
-      } catch (e) {
-        // saving error
-      }
+  sendPhoneNo = async () => {
+    try {
+      this.setState({showLoading: true})
+      await this.props.sendPhoneNo()
+      this.setState({showLoading: false, codeFeildShow: true})
+    } catch (error) {
+      this.setState({showLoading: false})
+      console.log(error)
     }
-
-    const getData = async () => {
-      try {
-        const value = await AsyncStorage.getItem('isFirstTime')
-        if(value !== null) {
-          // value previously stored
-          return value;
-        }
-      } catch(e) {
-        // error reading value
-      }
-    }
-
-    if(!getData()){
-      await storeData();
-    }
-
-    this.props.sendCode(this.props.auth);
+    
 
   }
 
-  verify = async () => {
-    await this.props.verifyCode(this.props.auth);
-    if(this.props.auth.isAuth){
-      this.setState({nameShow: true});
+  sendVerificationCode = async () => {
+
+    try {
+      this.setState({showLoading: true})
+      await this.props.sendVerificationCode()
+      this.setState({showLoading: false, nameShow: true})
+    } catch (error) {
+      this.setState({showLoading: false})
     }
-    
+
   }
 
-  saveCust = async () => {
-    await this.props.saveCustomer(this.props.auth);
-    if(this.props.auth.isCreated){
-      
+  registerCustomer = async () => {
+
+    try {
+      this.setState({showLoading: true})
+      await this.props.registerCustomer()
+      this.setState({showLoading: false})
+      this.props.navigation.navigate("MainTab")
+    } catch (error) {
+      this.setState({showLoading: false})
     }
-    
+
   }
   
+  renderPhoneInput = () => {
+    return (
+      <Block middle space="between">
+        <Block row style={{marginHorizontal: theme.sizes.base, marginTop: 60}} >
+            <TextInput
+                style={[styles.phoneInput, {width: '20%', height: 50, color: 'black', borderTopLeftRadius: 12,borderBottomLeftRadius: 12,}]}
+                value="+92"
+                editable={false}
+            />
+            <TextInput
+                style={[styles.phoneInput, {width: '80%', height: 50, color: 'black', letterSpacing: 4, borderTopRightRadius: 12,borderBottomRightRadius: 12,}]}
+                onChangeText={(e) => this.props.handleTextChange(e, 'phone')}
+                placeholder="Phone Number"
+                value={this.props.auth.phoneNumber}
+                keyboardType='numeric'
+            />
+        </Block>
+        <Block>
+            <TouchableOpacity style={styles.next} onPress={() => this.sendPhoneNo()}>
+                {
+                  this.state.showLoading ? (
+                    <ActivityIndicator size="small" color={theme.colors.white} />
+                    ) : (
+                    <Text bold white>
+                        Send Code
+                    </Text>
+                  )
+                }  
+            </TouchableOpacity>
+        </Block>
+        <Block center middle>
+          <TouchableOpacity onPress={() => this.props.navigation.navigate("Login")}> 
+            <Text gray size={12} style={{textDecorationLine: 'underline'}}>Already Have an account?</Text>
+          </TouchableOpacity>
+        </Block>
+      </Block>
+)
+  }
+
+  renderCodeInput = () => {
+    return (
+      <Block>
+        <TextInput
+            keyboardType='numeric'
+            placeholder="Code"
+            value={this.props.auth.code}
+            onChangeText={(e) => {this.props.handleTextChange(e,'code')}}
+            style={styles.textInput}
+        />
+        <TouchableOpacity style={styles.next} onPress={() => this.sendVerificationCode()}>
+                {
+                  this.state.showLoading ? (
+                    <ActivityIndicator size="small" color={theme.colors.white} />
+                    ) : (
+                    <Text bold white>
+                        Verify
+                    </Text>
+                  )
+                }
+        </TouchableOpacity>
+        <Block row space="around">
+            
+            <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
+                <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => this.props.resendCode(this.props.auth)}>
+                <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Resend Code</Text>
+            </TouchableOpacity>
+        </Block>
+    </Block>
+    )
+  }
+
+  renderNameInput = () => {
+    return (
+      <Block>
+          <TextInput
+              placeholder="Your Name"
+              value={this.props.auth.nameCustomer}
+              onChangeText={(e) => this.props.handleTextChange(e,"name")}
+              style={styles.textInput}
+          />
+          <Block row middle marginTop={theme.sizes.base}>
+              <Block>
+                  <TouchableOpacity style={styles.next} onPress={() => this.registerCustomer()}>
+                  {
+                    this.state.showLoading ? (
+                      <ActivityIndicator size="small" color={theme.colors.white} />
+                      ) : (
+                      <Text bold white>
+                          Register
+                      </Text>
+                    )
+                  }
+                  </TouchableOpacity>
+              </Block>
+              
+          </Block>
+      </Block>
+    )
+  }
 
   render() {
     return (
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={{flex:1}}
+      >
       <View
         style={{
           flex: 1,
@@ -214,7 +309,7 @@ class Register extends Component {
                 transform: [{ translateY: this.buttonY }]
               }}
             >
-              <Text style={{ color: 'white' }}>Register</Text>
+              <Text white bold >Register</Text>
             </Animated.View>
           </TapGestureHandler>
           
@@ -237,75 +332,13 @@ class Register extends Component {
             
             {
                 this.state.nameShow ? (
-                    <Block>
-                        <TextInput
-                            placeholder="Your Name"
-                            nameCustomer
-                            name="nameCustomer"
-                            value={this.props.auth.nameCustomer}
-                            onChangeText={(e) => { console.log('event',e); this.props.handleTextChangeName(e)}}
-                            style={styles.textInput}
-                        />
-                        <Block row middle marginTop={theme.sizes.base}>
-                            <Block>
-                                <TouchableOpacity style={styles.next} onPress={() => this.saveCust()}>
-                                    <Text style={{color: theme.colors.white}}>
-                                        Continue
-                                    </Text>
-                                </TouchableOpacity>
-                            </Block>
-                            {/* <Block>
-                                <TouchableOpacity style={styles.nextOutline} onPress={() => this.setState({nameShow: false})}>
-                                    <Text style={{color: theme.colors.accent}}>
-                                        View Intro
-                                    </Text>
-                                </TouchableOpacity>
-                            </Block> */}
-                        </Block>
-                    </Block>
+                    this.renderNameInput()
                 ) : (
                     this.state.codeFeildShow ? (
-                        <Block>
-                            <TextInput
-                                keyboardType='numeric'
-                                placeholder="Code"
-                                name="code"
-                                value={this.props.auth.code}
-                                onChangeText={(e) => { console.log('event',e); this.props.handleTextChangeCode(e)}}
-                                style={styles.textInput}
-                            />
-                            <TouchableOpacity style={styles.next} onPress={() =>  this.verify()}>
-                                <Text style={{color: 'white'}}>
-                                    Verify
-                                </Text>
-                            </TouchableOpacity>
-                            <Block row space="around">
-                                
-                                <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
-                                    <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this.props.reSendCode(this.props.auth)}>
-                                    <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Resend Code</Text>
-                                </TouchableOpacity>
-                            </Block>
-                        </Block>
-                    ) : (
-                        <Block>
-                            <TextInput
-                                keyboardType='numeric'
-                                placeholder="Phone Number"
-                                name="phoneNumber"
-                                value={this.props.auth.phoneNumber}
-                                onChangeText={(e) => { console.log('event',e); this.props.handleTextChangeNumber(e)}}
-                                style={styles.textInput}
-                            />
-                            <TouchableOpacity style={styles.next} onPress={() => this.sendCode()}>
-                                <Text style={{color: 'white'}}>
-                                    Send Code
-                                </Text>
-                            </TouchableOpacity>
-                        </Block>
-                    )
+                        this.renderCodeInput()
+                      ) : (
+                        this.renderPhoneInput()
+                      )
                 )
             }
             
@@ -316,6 +349,7 @@ class Register extends Component {
           </Animated.View>
         </View>
       </View>
+        </KeyboardAvoidingView>
     );
   }
 }
@@ -325,13 +359,11 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  handleTextChangeNumber: (e) => handleTextChangeNumber(dispatch, e),
-  handleTextChangeCode: (e) => handleTextChangeCode(dispatch, e),
-  handleTextChangeName: (e) => handleTextChangeName(dispatch, e),
-  sendCode: (auth) => sendCode(dispatch,auth),
-  reSendCode: (auth) => reSendCode(dispatch,auth),
-  verifyCode: (auth) => verifyCode(dispatch,auth),
-  saveCustomer: (auth) => saveCustomer(dispatch,auth),
+  handleTextChange: (value, field) => handleTextChange(dispatch, value, field),
+  sendPhoneNo: () => sendPhoneNo(dispatch),
+  sendVerificationCode: () => sendVerificationCode(dispatch),
+  resendCode: () => resendCode(dispatch),
+  registerCustomer: () => registerCustomer(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);
@@ -355,6 +387,22 @@ const styles = StyleSheet.create({
     shadowColor: 'black',
     shadowOpacity: 0.2
   },
+  buttonOutline: {
+    backgroundColor: theme.colors.white,
+    borderColor: theme.colors.accent,
+    borderWidth: 1,
+    height: 50,
+    marginHorizontal: 20,
+    borderRadius: 35,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginVertical: 5,
+    elevation: 10,
+    shadowOffset: {width:2, height: 2},
+    shadowColor: 'black',
+    shadowOpacity: 0.2,
+    
+  },
   textInput: {
       height: 50,
       borderRadius: 25,
@@ -371,8 +419,8 @@ const styles = StyleSheet.create({
   next: {
     backgroundColor: '#e91e63',
     height: 50,
-    marginHorizontal: 20,
-    borderRadius: 35,
+    marginHorizontal: theme.sizes.base,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 5,
@@ -382,7 +430,7 @@ const styles = StyleSheet.create({
     borderColor: '#e91e63',
     borderWidth: 1,
     height: 50,
-    marginHorizontal: 20,
+    marginHorizontal: theme.sizes.base,
     borderRadius: 35,
     alignItems: 'center',
     justifyContent: 'center',
@@ -398,5 +446,11 @@ const styles = StyleSheet.create({
       position: "absolute",
       top: -20,
       left: width / 2 -20 
-  }
+  },
+  phoneInput:{ 
+    backgroundColor: theme.colors.gray2,
+    paddingHorizontal: theme.sizes.base,
+    paddingVertical: 0,
+    fontSize: 15,
+  },
 });

@@ -10,52 +10,11 @@ import {  increaseAddOns , decreaseAddOns, increaseService,decreaseService} from
 
 const { StatusBarManager } = NativeModules;
 
-// const cartService = [{
-//     _id: "60805765a9b0a300042f7607",
-//     name: "Whitening facial",
-//     category: {
-//         _id: "6080570ca9b0a300042f7602",
-//         name: "Facial",
-//         picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-//         icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-//         created_at: "2021-04-21T16:47:08.090Z",
-//         updatedAt: "2021-04-21T16:47:08.090Z",
-//     },
-//     description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
-//     price: 300,
-//     availability: true,
-//     addons: [
-//         {name: "Extra 1", price: 500},
-//         {name: "Extra 2", price: 200},
-//         {name: "Extra 3", price: 300},
-//     ],
-// },
-// {
-//     _id: "60805765a9b0a300042f7607",
-//     name: "Whitening facial",
-//     category: {
-//         _id: "6080570ca9b0a300042f7602",
-//         name: "Facial and Massage",
-//         picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-//         icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-//         created_at: "2021-04-21T16:47:08.090Z",
-//         updatedAt: "2021-04-21T16:47:08.090Z",
-//     },
-//     description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
-//     price: 300,
-//     availability: true,
-//     addons: [
-//         {name: "Extra 1", price: 500},
-//         {name: "Extra 2", price: 200},
-//         {name: "Extra 3", price: 300},
-//     ],
-// }]
 
 const Cart = (props) => {
     const {cartServices} = props;
-    let totalbill = 0;
-    let addonsbill = 0;
-    if(cartServices.length === 0 ){
+    
+    if(cartServices && cartServices.length === 0 ){
         return(
             <Block center middle flex={1} color={theme.colors.white}> 
                 <Image source={require('../assets/images/empty-cart.png')} style={{width: 100, height: 100}} />
@@ -63,22 +22,13 @@ const Cart = (props) => {
             </Block>
         )
     }
-    cartServices.map( (service) => ( 
-        totalbill = (totalbill + (service.price * service.quantity ))))
-
-    cartServices.map( (service) => ( 
-        (service.addons.length >= 1)
-        ?(service.addons.map(addons=>(
-            addonsbill = addonsbill + (addons.price * addons.quantity)
-        )))
-        :''))
-        totalbill=totalbill+addonsbill;
+    
     return (
         
             <Block flex={1} style={styles.header}>
                 <Block flex={1} color={theme.colors.white} style={{borderRadius:12}} margin={[0,10,0,10]} center middle>
                     <Block padding={10} middle center >
-                        <Text bold h3>Total Bill: <Text accent h2>Rs. {totalbill}</Text></Text>
+                        <Text bold h3>Total Bill: <Text accent h2>Rs. {props.totalBill}</Text></Text>
                     </Block>
                 </Block>
                 <Block flex={8}  style={{borderRadius:12}} margin={[5,10,0,10]} > 
@@ -167,7 +117,7 @@ const Cart = (props) => {
                
                 </Block>
                 <Block flex={1} style={{marginBottom: theme.sizes.base* 1.4, marginHorizontal: 10}} >
-                    <Button color={theme.colors.accent} style={{borderRadius: 12}}><Text center white bold>Schedule your order</Text></Button>
+                    <Button onPress={() => props.navigation.navigate("ScheduleOrder")} color={theme.colors.accent} style={{borderRadius: 12}}><Text center white bold>Schedule your order</Text></Button>
                 </Block>
             </Block>
      
@@ -216,7 +166,8 @@ const styles = StyleSheet.create({
   });
 
 const mapStateToProps = (state) => ({
-    cartServices: state.cartReducer.cartServices
+    cartServices: state.cartReducer.cartServices,
+    totalBill: state.cartReducer.totalBill
 })
 
 const mapDispatchToProps = (dispatch) => ({

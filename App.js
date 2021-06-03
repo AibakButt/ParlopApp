@@ -1,54 +1,79 @@
-import React, { useEffect } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useEffect, useState} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import MyTabs from './navigation/index';
-import MyStack from './navigation/index';
+import AppStackScreens from './navigation/index';
 import { Provider } from 'react-redux';
 import store from './redux/index';
-import Register from './screens/Register';
-import ScheduleOrder from './screens/ScheduleOrder';
+
+import FlashMessage from "react-native-flash-message";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import IntroStackScreens from './navigation/IntroStack';
+import MainBottomTabScreens from './navigation/MainBottomTabs';
+
+import AppLoading from 'expo-app-loading';
+import { Asset, useAssets } from "expo-asset";
+
+// import all used images
+const images = [
+ 
+  require("./assets/images/empty-cart.png"),
+  require("./assets/images/gift.png"),
+  require("./assets/images/illustration1.png"),
+  require("./assets/images/illustration2.png"),
+  require("./assets/images/illustration3.png"),
+  require("./assets/images/no-addon.jpg"),
+  require("./assets/images/register-bg.jpg"),
+];
 
 export default function App() {
 
-  const [isFirstTime, setIsFirstTime] = React.useState(true);
+  const [firstTime, setFirstTime] = useState(true);
+  const [isReady, setIsReady] = useState(true);
+  const [assets, error] = useAssets(images);
+
 
   useEffect(() => {
-    const getData = async () => {
+    const checkFirstVisit = async () => {
       try {
-        const value = await AsyncStorage.getItem('isFirstTime')
-        if(value !== null) {
-          console.log("sdsdfssd",value)
-          setIsFirstTime(false);
+        const value = await AsyncStorage.getItem('firstTime')
+        console.log("fetched valued", value)
+        if(value == null) {
+          console.log("first_time", value)
+          AsyncStorage.setItem('firstTime',"true")
+          setFirstTime(true);
       
+        }
+        else if(value == "true"){
+          console.log("Not first time", value)
+          setFirstTime(false)
         }
       } catch(e) {
         // error reading value
+        console.log("Error fetching first time from local storage",error)
       }
     }
   
-    getData();
+    checkFirstVisit();
    
-  });
+  },[]);
+
+
+ 
+  if (!assets) {
+    return (
+      <AppLoading />
+        
+    );
+  }
+ 
 
   return (
       <Provider store={store}>
         <NavigationContainer>
           {
-          !isFirstTime
-          ? <Register/>
-          : <MyTabs />
+            firstTime ? <IntroStackScreens/> : <MainBottomTabScreens/>
           }
-          {/* <ScheduleOrder/> */}
+          <FlashMessage position="top" />
         </NavigationContainer>
       </Provider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});

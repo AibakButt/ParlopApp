@@ -1,420 +1,332 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from './../components/index';
-import { TouchableOpacity } from 'react-native';
+import { TouchableOpacity, useWindowDimensions, NativeModules, Platform, StyleSheet, ScrollView, Animated, Modal, Image} from 'react-native';
+import {Collapse, CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
+import { TabView, SceneMap } from 'react-native-tab-view';
+import { theme } from '../constants';
+import Icon from '../components/Icon';
+import { endServiceTime, startServiceTime, fetchOrders } from './../redux/actions/orderActions';
+
+
+const { StatusBarManager } = NativeModules;
+
+const bookings = [{
+    orderNo: 'RS1325',
+    date: new Date().toDateString(),
+    time: new Date().getHours(),
+    services: [{
+        category: {
+             name: 'Facial'
+        },
+        name: "Face Facial",
+        price: 500,
+        quantity: 10,
+        addons: [{name: 'herbal oil', price: 100 , quantity: 10}]
+    }],
+    employee: {
+        name: "Sana",
+        profilePicture: require('../assets/images/gift.png'),
+        email: 'aibak.butt113@gmail.com',
+        phone: '03054876104'
+    },
+    status: "Pending",
+    customer: {
+        name: "Aibak"
+    },
+    start_time: new Date(),
+    end_time: new Date(),
+    address: 'Kashmir Road, Wahdat Colony, Lahore',
+    orderTotal: 5000
+
+}]
 
 const Bookings = (props) => {
 
-    const temp = () => {
-        let areas = `
-
-<td>Sukh Chain Society
-<td>Bahria Town
-<td>EME DHA Society
-
-<td>PASCO Housing Society
-<td>Eden Canal Villas
-<td>Eden Homes
-
-<td>Fransisi Town
-<td>Doctors Society
-<td>Thokar Niaz Baig
-
-<td>Sarshar Town
-<td>Awan Town
-<td>Canal Breeze
-
-<td>Allama Iqbal Town
-<td>Saidpur
-<td>Sabzazar
-
-<td>Samanabad
-<td>Ichhra
-<td>Wahdat Colony
-
-<td>Gulshan E Ravi
-<td>Riwaz Garden
-<td>Band Road
-
-<td>Sanda Khurd
-<td>Sanda Kalan
-<td>Islam Pura
-
-<td>Sanat Nagar
-<td>Bilal Gang
-<td>Amin Park
-
-<td>Karim Park
-<td>Ravi Road
-<td>Data Nagar
-
-<td>Shad Bagh
-<td>Usman Ganj
-<td>Misri Shah
-
-<td>Faruque Ganj
-<td>Badami Bagh
-<td>Darbar Gurreh Shah
-
-<td>Baghban Pura
-<td>Star Town
-<td>Wapda Colony
-
-<td>Shalimar Town
-<td>Khudad Town
-<td>Mahmood Booty Ring Road
-
-<td>Herbuns Pura
-<td>Shalimar Link Road
-<td>Ghousia Colony
-
-<td>Ram Garh
-<td>Mughal Pura
-<td>Nabi Pura
-
-<td>Ittehad Colony
-<td>Samia Town
-<td>Muslima Bad
-
-<td>Ali Park
-<td>Guldasit Colony
-<td>New PAF Colony
-
-<td>Officers Colony
-<td>Mustafa Bad
-<td>Fortress Stadium
-
-<td>Burj Colony
-<td>Canal Road
-<td>Canal View Colony
-
-<td>Suparco Colony
-<td>Engineer Cooperative Society
-<td>Tech Society
-
-<td>PCSIR Housing Scheme
-<td>PCSIR Housing Society
-<td>Alpha Co Operative
-
-<td>Punjab University
-<td>Jinnah Hospital
-<td>Allama Iqbal Medical College
-
-<td>Punjab University Hostel
-<td>New Garden Town
-<td>Muslim Town
-
-<td>Shadman Colony
-<td>Fc College
-<td>Shah Jamal
-
-<td>Johar Town
-<td>PIA Society
-<td>Revenue Society
-
-<td>Airline Society
-<td>Shama Colony
-<td>Peco Road
-
-<td>Faisal Town
-<td>Model Town
-<td>New Mustafa Colony
-
-<td>Wafaqi Colony
-<td>Township
-<td>Kot Lakhpat
-
-<td>Bostan Colony
-<td>Baba Farid Colony
-<td>Race Course Town
-
-<td>Hamdard Chowk
-<td>Green Town
-<td>PCSIR Society
-
-<td>Bagrian
-<td>Punjab Govt Employs Coparative Society
-<td>Raiwind Road
-
-<td>Lake City
-<td>Lalzar Colony
-<td>West Wood Colony
-
-<td>Shabir Town
-<td>Main Khayaban Road
-<td>Opf Colony
-
-<td>Opf Housing Scheme
-<td>Nasheman Iqbal Housing Scheme
-<td>Tariq Garden
-
-<td>NFC Town
-<td>Wapda Town
-<td>Khyaban E Amin
-
-<td>Nespak Society
-<td>Anar Kali
-<td>Mall Road
-
-<td>Aitchison Society
-<td>Davis Road
-<td>Garhi Shahu
-
-<td>Railway Housing Society
-<td>Dharampura
-<td>Mayo Hospital
-
-<td>Gawal Mandi
-<td>Lakshmi Chowk
-<td>Punjab University Old Campus
-
-<td>Qila Gujarsing
-<td>Wapda House
-<td>Jail Road
-
-<td>Mazang
-<td>Ganga Ram Hospital
-<td>Race Course Park Surrounding Area
-
-<td>Gor
-<td>Gulberg 1
-<td>Gulberg 2
-
-<td>Gulberg 3
-<td>Firozpur Road
-<td>Askari Colony
-
-<td>Gulbahar Colony
-<td>Madina Colony
-<td>Walton Road
-
-<td>Ghazi Road
-<td>Chungi Amer Sadhu
-<td>Awan Market
-
-<td>Nishtar Colony
-<td>Youhna Bad
-<td>Abdalian Housing Society
-
-<td>Bedian Road
-<td>Alfalah Town
-<td>Chararrd Village
-
-<td>Cavalry Ground
-<td>Super Town
-<td>Rehman Garden
-
-<td>Punjab Society Near Dha
-<td>Sui Gas Society
-<td>State Life Society
-
-<td>DHA 1
-<td>DHA 2
-<td>DHA 3
-
-<td>DHA 4
-<td>DHA 5
-<td>DHA 6
-
-<td>DHA 7
-<td>DHA 8
-<td>Lidhar
-
-<td>Chachowali
-<td>Gohawa
-<td>Airport Road
-
-<td>Cantt
-<td>Askrai Villa 1
-<td>Askrai Villa 2
-
-<td>Askrai Villa 3
-<td>Askrai Villa 4
-<td>Askrai Villa 5
-
-<td>Askrai Villa 6
-<td>Askrai Villa 7
-<td>Askrai Villa 8
-
-<td>Askrai Villa 9
-<td>Askrai Villa 10
-<td>Askrai Villa
-
-<td>Army Housing Society
-<td>Eden Avenue
-<td>Eden View
-
-<td>Barki Road
-<td>Paragon City
-<td>LUMS
-
-<td>Rang Mehal
-<td>Architects Engineers Society
-<td>Civic Center
-
-<td>Gor I
-<td>Gor II
-<td>Gor III
-
-<td>Gor IV
-<td>Gor V
-<td>Tariq Block
-
-<td>Aurangzeb Block
-<td>Aibak Block
-<td>Babar Block
-
-<td>Tipu Block
-<td>Shersha Block
-<td>Atta Turk Block
-
-<td>Usman Block
-<td>Ali Block
-<td>Garden Block
-
-<td>Abu Bakar Block
-<td>Ahmed Block
-<td>Iqbal Ave Housing Society
-
-<td>Gulberg 5
-<td>Gulberg 4
-<td>Ferozpur Road
-
-<td>CMA Colony
-<td>Saint John Park
-<td>Saddar
-
-<td>Main Mir Colony
-<td>Upper Mall Scheme
-<td>Temple Road
-
-<td>Quaid e Azam Industrial Estate
-<td>Kainchi
-<td>K B Society
-
-<td>Salamatpura
-<td>Sarwar Road
-<td>Taj Bagh
-
-<td>Taj Para
-<td>Moon Market
-<td>Nizam Block
-
-<td>Shaikh Zayed Hospital
-<td>Gulshan Block
-<td>Shaukat Khanum Hospital
-
-<td>UCP
-<td>Muhafiz Town
-<td>LDA Avenue
-
-<td>Canal Garden
-<td>Tricon Valley
-<td>Jubli Town
-
-<td>Izmir Town
-<td>Iqbal Avenue
-<td>Canal Bank
-
-<td>Canal Park Society
-<td>Main Gulberg Boulevard
-<td>Falcon Complex
-
-<td>M M Alam Road
-<td>Asif Block
-<td>Multan Road
-
-<td>Badar Block
-<td>Chenab Block
-<td>College Block
-
-<td>Education Town
-<td>Huma Block
-<td>Hunza Block
-
-<td>Jehanzeb Block
-<td>Kamran Block
-<td>Karim Block
-
-<td>Khyber Block
-<td>Mamdoot Block
-<td>Maraghzar Colony
-
-<td>Mehran Block
-<td>Mustafa Town
-<td>Nargis Block
-
-<td>Neelam Block
-<td>Nishtar Block
-<td>Pak Block
-
-<td>Ravi Block
-<td>Rachna Block
-<td>Raza Block
-
-<td>Sutlej Block
-<td>Sikandar Block
-<td>Umer Block
-
-<td>Zeenat Block
-<td>Makkah Colony
-<td>Khuda Buksh Colony
-
-<td>Fort Villas
-<td>Bridge Colony
-<td>Lahore Gym Khana
-
-<td>Infantry Road
-<td>Khursheed Alam Road
-<td>Nisar Colony
-
-<td>Tufail Road
-<td>Lawrence Road
-<td>Nasheman Colony
-
-<td>Munir Road
-<td>R A Bazaar
-<td>Shahtaj Colony
-
-<td>Zaman Colony
-<td>LDA Colony
-<td>University of Lahore
-
-<td>Valencia Town Block A1
-<td>Valencia Town Block A2
-<td>Valencia Town Block A3
-
-<td>Valencia Town Block C
-<td>Valencia Town Block F
-<td>Valencia Town Block G
-
-<td>Valencia Town Block H
-<td>Valencia Town Block H1
-<td>Valencia Town Block J
-
-<td>Valencia Town Block K1
-<td>Valencia Town Block L
-<td>Valencia Town Block P1
-`
-
-let arr = areas.split("<td>")
-console.log(arr)
+    useEffect(() => {
+
+        props.fetchBookings();
+        
+      }, []);
+
+    const [modalShow, setModalShow] = useState(null)
+
+    const renderEmployeeData = (booking) => {
+        return (
+            <Modal
+                transparent={false}
+                visible={modalShow === booking.orderNo}
+                style={styles.modalView}
+            >
+                <Block padding={theme.sizes.base} style={{borderBottomColor: theme.colors.gray2, borderBottomWidth: 1}}>
+                    <Block >
+                        <Icon
+                        name="close"
+                        color={theme.colors.accent}
+                        backgroundColor="white"
+                        onPress={() => setModalShow(null)}
+                        size={22}
+                        /> 
+                    </Block>
+                    <Block center>
+                        <Image source={booking.employee.profilePicture} style={{width: 100, height: 100, borderRadius: 50}} />
+                    </Block>
+                    <Block center>
+                        <Text>{booking.employee.name}</Text>
+                        <Text>{booking.employee.email}</Text>
+                        <Text>{booking.employee.phone}</Text>
+                    </Block>
+                </Block>
+            </Modal>    
+        )
     }
+
+    const renderOrderServices = (services) => {
+        return (
+            <Block flex={8}  style={{borderRadius:12}} margin={[0,20,0,20]} > 
+                    <ScrollView
+                        showsVerticalScrollIndicator={false}
+                        contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
+                        style={{margintop:theme.sizes.base*2, borderRadius:12}}
+                    >
+                        {
+                            services.map( (service, sindex) => (
+                                <Block key={sindex} color={theme.colors.white} style={{ marginBottom: theme.sizes.base*0.5, borderRadius: 12}}>
+                                    <Block row >
+                                        <Block flex={6} >
+                                            <Block padding={theme.sizes.base} space="around">
+                                                <Block color="accent" center middle style={{ alignSelf: 'flex-start',borderRadius: 12, paddingHorizontal:10, paddingVertical: 1}}><Text center white>{service.category.name}</Text></Block>
+                                                <Block padding={5}><Text>{service && service.name?service.name:''}</Text></Block>
+                                                <Block paddingHorizontal={5}><Text accent h3>Rs. {service.price}</Text></Block>
+                                            </Block>
+                                        </Block>
+                                        <Block flex={4} row center middle>
+                                        
+                                            <Text h4 center style={styles.actionText}>Qty: </Text>
+                                            <Text h3 center style={styles.actionText}>{service.quantity}</Text>
+                                            
+                                        </Block>
+                                    </Block>
+                                    {
+                                        service.addons.length >= 1 && (
+                                            service.addons.map((addon, index) => (
+                                                <Block key={index} row padding={[theme.sizes.base * 0.5, theme.sizes.base*3]} >
+                                                    <Block flex={7} >
+                                                        <Block  space="around">
+                                                            <Text>{addon.name}</Text>
+                                                            <Text accent h4>Rs. {addon.price}</Text>
+                                                        </Block>
+                                                    </Block>
+                                                    <Block flex={3} row  space="" center middle>
+                                                   
+                                                        
+                                                    
+                                                    <Text h4 center middle style={styles.actionText2}>Qty: </Text>
+                                                    <Text h5 center middle style={styles.actionText2}>{addon.quantity}</Text>
+                                                   
+                                                        
+                                                   
+                                                    </Block>
+                                                </Block>
+                                            ))
+                                        )
+                                    }
+                                </Block>
+                            ))
+                        }
+                    </ScrollView>
+               
+                </Block>
+        )
+    }
+
+    const renderBookingCard = (booking) => {
+        return (
+            
+                    <Block key={booking.code} color={theme.colors.white} padding={theme.sizes.base} margin={[theme.sizes.base * 0.5,theme.sizes.base,theme.sizes.base*0.5,theme.sizes.base]} style={{borderRadius: 12}}>
+                        {renderEmployeeData(booking)}
+                        <Block row space="between">
+                            <Block>
+                                <Text size={17} bold>Order No. {booking.orderNo}</Text>
+                                <Text size={12} >Order Date. {booking.date + " at " + booking.time}</Text>
+                            
+                            </Block>
+                            
+                        </Block>
+                        <Block >
+                            <Block>
+                                <Text bold gray size={13}>{booking.code}</Text>
+                            </Block>
+                        </Block>
+                        <Block row space="between" paddingTop={theme.sizes.base*0.75}>
+                            <TouchableOpacity onPress={() => setModalShow(booking.orderNo)}>
+                                <Text gray center>Beauticain: <Text bold black>{booking.employee ? booking.employee.name : "Pending..."}</Text></Text>
+                            </TouchableOpacity>
+                            <Text center>Total: <Text bold >Rs.</Text><Text bold accent>{booking.orderTotal}</Text></Text>
+                        </Block>
+                        <Block center marginTop={theme.sizes.body}>
+                            <Text style={{alignSelf: 'flex-start'}} size={12} gray>When your beautician arrives press the start button</Text>
+                            <TouchableOpacity style={styles.startButton} onPress={()=>{}}>
+                                <Text style={{marginVertical: 3}} center white size={16}>Start</Text>
+                            </TouchableOpacity>
+                        </Block>
+                        <Collapse>
+                            <CollapseHeader>
+                                <Block style={{ borderTopWidth: 1, borderColor: theme.colors.gray, padding: 5}} center >
+                                    <Text size={12} gray style={{textDecorationLine: "underline"}}>View Order Details</Text>
+                                </Block>
+                            </CollapseHeader>
+                            <CollapseBody>
+                                {renderOrderServices(booking.service)}
+                            </CollapseBody>
+                        </Collapse>
+                </Block>
+                
+            
+        )
+    }
+
+    const layout = useWindowDimensions();
+
+    const [index, setIndex] = React.useState(0);
+    const [routes] = React.useState([
+        { key: 'active', title: 'Active' },
+        { key: 'past', title: 'Past' },
+    ]);
+
+    const ActiveBookings = () => {
+        if(props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').length === 0){
+            return(
+                <Block center middle flex={1} color={theme.colors.white}> 
+                    <Icon
+                        name="book"
+                        type="ant"
+                        color={theme.colors.gray}
+                        size={40}
+                    /> 
+                    <Text gray center size={20} style={{padding: theme.sizes.base}}>No Active Bookings</Text>
+                </Block>
+            )       
+        }
+        else{
+            return (
+                <Block color={theme.colors.gray2}>
+                    <ScrollView>
+                        {
+                            props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').map(booking => (
+                                renderBookingCard(booking)
+                            ))
+                        }
+                    </ScrollView>
+                </Block>
+            )
+        }
+    };
+      
+      const PastBookings = () => {
+        if(props.bookings && props.bookings.filter(booking => booking.status==='Cancel' || booking.status === 'Completed').length === 0){
+            return(
+                <Block center middle flex={1} color={theme.colors.white}> 
+                    <Icon
+                        name="book"
+                        type="ant"
+                        color={theme.colors.gray}
+                        size={40}
+                    /> 
+                    <Text gray center size={20} style={{padding: theme.sizes.base}}>No Past Bookings</Text>
+                </Block>
+            )       
+        }
+        <Block style={{ flex: 1, backgroundColor: '#673ab7' }} />
+      };
+
+    const renderScene = SceneMap({
+        active: ActiveBookings,
+        past: PastBookings,
+    });
+    
+    const renderTabBar = (props) => {
+        const inputRange = props.navigationState.routes.map((x, i) => i);
+    
+        return (
+          <Block flex={false} space="around" row middle>
+            {props.navigationState.routes.map((route, i) => {
+              const opacity = props.position.interpolate({
+                inputRange,
+                outputRange: inputRange.map((inputIndex) =>
+                  inputIndex === i ? 1 : 0.5
+                ),
+              });
+    
+              return (
+                <TouchableOpacity
+                  style={styles.tabItem}
+                  onPress={() => setIndex(i)}>
+                  <Animated.Text style={{opacity}}>{route.title}</Animated.Text>
+                </TouchableOpacity>
+              );
+            })}
+          </Block>
+        );
+      };
+
+
+   
+
     return (
-        <Block center middle>
-<TouchableOpacity onPress={()=>temp()}>
-            <Text>Bookings</Text>
-        </TouchableOpacity>
+        <Block style={styles.header} >
+            <TabView
+                navigationState={{ index, routes }}
+                renderScene={renderScene}
+                onIndexChange={setIndex}
+                initialLayout={{ width: layout.width }}
+                renderTabBar={renderTabBar}
+                style={{backgroundColor: theme.colors.white}}
+            />
         </Block>
     )
 }
 
 const mapStateToProps = (state) => ({
-    
+    bookings: state.orderReducer.orders,
 })
 
-const mapDispatchToProps = {
-    
-}
+const mapDispatchToProps = (dispatch) => ({
+    fetchBookings: () => fetchOrders(dispatch),
+    startServiceTime: () => startServiceTime(dispatch),
+    endServiceTime: () => endServiceTime(dispatch)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(Bookings)
+
+const styles = StyleSheet.create({
+    header: {
+      paddingTop: Platform.OS === 'ios' ? 25 : StatusBarManager.HEIGHT * 1.5,
+      paddingBottom: theme.sizes.base
+    },
+   
+    tabItem: {
+        alignItems: 'center',
+        padding: theme.sizes.base,
+      },
+    startButton: {
+        backgroundColor: theme.colors.accent,
+        borderRadius: 12,
+        width: theme.sizes.base*4,
+        margin: theme.sizes.base*0.5
+    },
+    modalView: {
+        margin: theme.sizes.base*3,
+        backgroundColor: theme.colors.white,
+        borderRadius: 20,
+        shadowColor: "#000",
+        shadowOffset: {
+          width: 0,
+          height: 2
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5
+      },
+  });
+  

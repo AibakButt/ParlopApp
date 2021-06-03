@@ -1,14 +1,17 @@
-import React, { useRef } from 'react'
-import { ScrollView, TouchableOpacity } from 'react-native'
+import React, { useRef, useEffect, useState} from 'react'
+import { Picker, ScrollView, TouchableOpacity } from 'react-native'
 import { connect } from 'react-redux'
 import { Block, Text } from '../components'
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { useState } from 'react';
-import { StyleSheet, TextInput } from 'react-native';
+import { StyleSheet, TextInput, Platform } from 'react-native';
 import { theme } from '../constants';
 import Icon from '../components/Icon';
-import PhoneInput from "react-native-phone-number-input";
-import Input from './../components/Input';
+import { showMessage, hideMessage } from "react-native-flash-message";
+import { handleTextChange } from './../redux/actions/orderActions';
+import { getCurrentCustomer } from '../redux/actions/authentication';
+import RNPickerSelect from 'react-native-picker-select';
+
+
 
 
 function ScheduleOrder(props) {
@@ -16,18 +19,81 @@ function ScheduleOrder(props) {
     const [time, setTime] = useState(new Date());
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
+
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
+
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     let phoneInput = useRef();
 
+    const [customer, setCustomer] = useState(null)
 
-    const onChangeDate = (date) => {
-        setDate(date)
-        setShowDatePicker(false)
+    useEffect( () => {
+
+        const getCustomer = async () => {
+            try {
+                setCustomer(await getCurrentCustomer())
+            } catch (error) {
+                console.log(error)
+            }
+    
+        }
+        
+        getCustomer()
+
+        
+    }, []);
+
+
+    const onChangeDate = (selectedDate) => {
+        setShowDatePicker(false);
+        let now  = new Date()
+        if(selectedDate.getDay() < now.getDay()){
+            showMessage({
+                message: "Date can only be selected onwards from today",
+                type: "danger",
+                floating: true
+              });
+            setDate(date);
+        }else{
+            setDate(selectedDate);
+            props.handleTextChange(selectedDate,"date")
+        }
     }
 
-    const onChangeTime = (time) => {
-        setTime(time)
-        setShowTimePicker(false)
+    const onChangeTime = (selectedTime) => {
+        const currentTime = selectedTime || time;
+        setShowTimePicker(false);
+        let now  = new Date()
+        let sameDay = date.getDay() === now.getDay()
+
+        if(sameDay){
+            if(selectedTime.getHours() >= 4 && selectedTime.getHours() <= 16 ){
+                setTime(currentTime);
+                props.handleTextChange(selectedDate,"time")
+            }
+            else{
+                showMessage({
+                    message: "On a same day time can only be selected from 4:59 AM to 4:59 PM",
+                    type: "danger",
+                    floating: true
+                  });
+            }
+        }
+        else{
+            if(selectedTime.getHours() >= 8 && selectedTime.getHours() <= 20 ){
+                setTime(currentTime);
+                props.handleTextChange(selectedDate,"time")
+            }
+            else{
+                showMessage({
+                    message: "Time can only be selected from 8:59 AM to 8:59 PM",
+                    type: "danger",
+                    floating: true
+                  });
+            }
+        }
+        
     }
 
     const getAMPM = (hours) => {
@@ -37,7 +103,10 @@ function ScheduleOrder(props) {
       }
    
 
+    const {order} = props;
+    
     return (
+
        <Block color={theme.colors.gray2}>
             <Block flex={0.9}>
                 <ScrollView>
@@ -103,14 +172,15 @@ function ScheduleOrder(props) {
                         <Block row style={{marginHorizontal: theme.sizes.base}}>
                             <TextInput
                                 style={[styles.phoneInput, {width: '20%', color: 'black', borderTopLeftRadius: 12,borderBottomLeftRadius: 12,}]}
-                                value="     +92"
+                                value="+92"
                                 editable={false}
                             />
                             <TextInput
+                                editable={!customer}
                                 style={[styles.phoneInput, {width: '80%', color: 'black', letterSpacing: 4, borderTopRightRadius: 12,borderBottomRightRadius: 12,}]}
-                                onChangeText={() => {}}
+                                onChangeText={(value) => props.handleTextChange("phone",value)}
                                 placeholder="Phone Number"
-                                
+                                value={customer && customer.phone? customer.phone.substr(2,customer.phone.length-1): order.phone}
                             />
                         </Block>
                     </Block>
@@ -118,26 +188,52 @@ function ScheduleOrder(props) {
                         <Text style={styles.text}>Address</Text>
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={() => {}}
+                            onChangeText={(value) => props.handleTextChange("address",value)}
                             placeholder="Home Address"
                             multiline
                             numberOfLines={3}
+                            value={order.address}
                         />
+                    </Block>
+                    <Block>
+                        <Text style={styles.text}>Area</Text>
+                        
+                        <Block style={styles.picker} middle >
+                            
+                            <RNPickerSelect
+                                style={{inputAndroid: styles.select, inputIOS: styles.select, }}
+                                useNativeAndroidPickerStyle={false}
+                                value={order.area}
+                                onValueChange={(value) => props.handleTextChange("area",value)}
+                                items={[
+                                    {label: "Johar Town", value: "Johar Town" },
+                                    {label: 'Gulberg', value: 'Gulberg' },
+                                    {label: 'Iqbal Town', value: 'Iqbal Town' },
+                                    {label: 'DHA', value: 'DHA' },
+                                    {label: 'Upper Mall', value: 'Upper Mall' },
+                                    {label: 'Other', value: 'Other' },
+                                ]}
+                                
+                            />
+                        </Block>
+                        
+                        <Text gray style={{padding: theme.sizes.base}}>Note: Travel Charges may apply on areas other than listed above</Text>
                     </Block>
                     <Block>
                         <Text style={styles.text}>Special Instructions</Text>
                         <TextInput
                             style={styles.textInput}
-                            onChangeText={() => {}}
+                            onChangeText={(value) => props.handleTextChange("specialInstructions",value)}
                             placeholder="Special instruction to your beautician"
                             multiline
                             numberOfLines={3}
+                            value={order.specialInstructions}
                         />
                     </Block>
                 </ScrollView>
             </Block>
             <Block flex={0.1} >
-                <TouchableOpacity style={styles.orderButton} >
+                <TouchableOpacity style={styles.orderButton} onPress={() => props.navigation.push("OrderSummary")}>
                    
                         <Text white size={16} bold center> 
                             Place your order
@@ -150,12 +246,12 @@ function ScheduleOrder(props) {
 }
 
 const mapStateToProps = (state) => ({
-    
+    order: state.orderReducer.order
 })
 
-const mapDispatchToProps = {
-    
-}
+const mapDispatchToProps = (dispatch) => ({
+    handleTextChange: (field, value) => handleTextChange(dispatch, field, value)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(ScheduleOrder)
 
@@ -199,5 +295,14 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         backgroundColor: theme.colors.accent,
  
-    }
+    },
+    select:{
+        marginHorizontal: theme.sizes.base,
+        borderRadius: 12,
+        backgroundColor: theme.colors.white,
+        paddingHorizontal: theme.sizes.base,
+        height: theme.sizes.base * 3,
+        color:  theme.colors.black
+       
+    },
 })

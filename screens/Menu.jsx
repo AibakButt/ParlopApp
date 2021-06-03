@@ -1,25 +1,48 @@
-import React from 'react'
+import React, {useState, useEffect} from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from './../components/index';
 import { StyleSheet, NativeModules, ScrollView, Image, TouchableOpacity } from 'react-native';
 import { theme } from '../constants';
 import { Platform } from 'react-native';
 import Icon from '../components/Icon';
+import { getCurrentCustomer } from '../redux/actions/authentication';
 
 const { StatusBarManager } = NativeModules;
 
 const Menu = (props) => {
+
+    const [customer, setCustomer] = useState(null)
+
+    useEffect( () => {
+
+        const getCustomer = async () => {
+            try {
+                setCustomer(await getCurrentCustomer())
+            } catch (error) {
+                console.log(error)
+            }
+    
+        }
+        
+        getCustomer()
+
+        
+    }, []);
+
+    
+
     return (
         <Block flex={1} style={styles.header}>
+            {console.log("token receivedd...", getCurrentCustomer())}
                 <Block row flex={1.5} color={theme.colors.white} style={{borderRadius:12}} margin={[0,10,0,10]} center middle>
                     <Block style={{paddingHorizontal: 12}} flex={2}>
                         <Image source={require('../assets/images/user.png')} style={styles.logo}/>
                     </Block>
                     <Block flex={6}>
-                        <Text size={22}>Guest User</Text>
+                        <Text size={22}>{customer ? customer.name : "Guest User"}</Text>
                     </Block>
                     <Block flex={2}>
-                        <TouchableOpacity>
+                        <TouchableOpacity onPress={() => props.navigation.navigate("Login")}>
                             <Text size={12} accent>
                                 Signin / Signup
                             </Text>
@@ -44,7 +67,7 @@ const Menu = (props) => {
                             <Text style={{paddingLeft: 12}} size={18}>Play Intro</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem}>
+                       <TouchableOpacity style={styles.menuItem} onPress={()=>props.navigation.navigate("Coupons")}>
                             <Block row>
                             <Icon
                                 name={'pricetag'}
@@ -66,18 +89,18 @@ const Menu = (props) => {
                             <Text style={{paddingLeft: 12}} size={18}>FAQ's</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem}>
+                       <TouchableOpacity style={styles.menuItem} onPress={()=>props.navigation.navigate("Settings")}> 
                             <Block row>
-                            <Icon
-                                name={'settings'}
-                                type={'feather'}
-                                size={22}
-                                color={theme.colors.accent}
-                            />
-                            <Text style={{paddingLeft: 12}} size={18}>Settings</Text>
+                                <Icon
+                                    name={'settings'}
+                                    type={'feather'}
+                                    size={22}
+                                    color={theme.colors.accent}
+                                />
+                                <Text style={{paddingLeft: 12}} size={18}>Settings</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem}>
+                       <TouchableOpacity style={styles.menuItem} onPress={() => props.navigation.navigate("ContactUs")}>
                             <Block row>
                             <Icon
                                 name={'phone'}

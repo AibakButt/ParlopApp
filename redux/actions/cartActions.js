@@ -4,7 +4,6 @@ import * as ActionTypes from "../types/cartTypes";
 export const addToCart = async (dispatch, service) => {
     try {
       
-      console.log("inside add to cart",service);
       let cartServices = [...store.getState().cartReducer.cartServices];
       cartServices.push({
           _id:service._id, 
@@ -14,10 +13,10 @@ export const addToCart = async (dispatch, service) => {
           quantity:1,
           addons:[]
         });
-      console.log("added to cart", cartServices);
+      // console.log("added to cart", cartServices);
       dispatch({
         type: ActionTypes.ADD_TO_CART,
-        payload: cartServices,
+        payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
       });
 
     } catch (error) {
@@ -28,7 +27,6 @@ export const addToCart = async (dispatch, service) => {
 
 export const addAddOns= async (dispatch, addons, serviceId) => {
   try {
-    console.log("inside add to cart",serviceId);
     let cartServices = [...store.getState().cartReducer.cartServices];
     let added=false;
     cartServices.forEach(service => {
@@ -55,10 +53,9 @@ export const addAddOns= async (dispatch, addons, serviceId) => {
         } 
       }
     }
-    console.log("added to cart", cartServices);
     dispatch({
       type: ActionTypes.ADD_TO_CART,
-      payload: cartServices,
+      payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
     });
 
   } catch (error) {
@@ -68,16 +65,14 @@ export const addAddOns= async (dispatch, addons, serviceId) => {
 
 export const increaseAddOns = async (dispatch, addonIndex, serviceIndex) => {
   try {
-    console.log("inside add to cart",addonIndex,serviceIndex);
     let cartServices = [...store.getState().cartReducer.cartServices];
     let servicetoIcrease = cartServices[serviceIndex];
     if(servicetoIcrease.addons[addonIndex].quantity<servicetoIcrease.quantity){
       servicetoIcrease.addons[addonIndex].quantity++;
     }
-    console.log("added to cart", cartServices);
     dispatch({
       type: ActionTypes.ADD_TO_CART,
-      payload: cartServices,
+      payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
     });
 
   } catch (error) {
@@ -87,7 +82,6 @@ export const increaseAddOns = async (dispatch, addonIndex, serviceIndex) => {
 
 export const decreaseAddOns = async (dispatch, addonIndex, serviceIndex) => {
   try {
-    console.log("inside add to cart",addonIndex,serviceIndex);
     let cartServices = [...store.getState().cartReducer.cartServices];
     
     let servicetoIcrease = cartServices[serviceIndex];
@@ -97,10 +91,9 @@ export const decreaseAddOns = async (dispatch, addonIndex, serviceIndex) => {
       servicetoIcrease.addons.splice(addonIndex, 1);
     }
     
-    console.log("added to cart", cartServices);
     dispatch({
       type: ActionTypes.ADD_TO_CART,
-      payload: cartServices,
+      payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
     });
 
   } catch (error) {
@@ -110,14 +103,13 @@ export const decreaseAddOns = async (dispatch, addonIndex, serviceIndex) => {
 
 export const increaseService = async (dispatch, serviceIndex) => {
   try {
-    console.log("inside add to cart",serviceIndex);
     let cartServices = [...store.getState().cartReducer.cartServices];
     let servicetoIcrease = cartServices[serviceIndex];
     servicetoIcrease.quantity++;
     console.log("added to cart", cartServices);
     dispatch({
       type: ActionTypes.ADD_TO_CART,
-      payload: cartServices,
+      payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
     });
 
   } catch (error) {
@@ -127,7 +119,6 @@ export const increaseService = async (dispatch, serviceIndex) => {
 
 export const decreaseService = async (dispatch, serviceIndex) => {
   try {
-    console.log("inside add to cart",serviceIndex);
     let cartServices = [...store.getState().cartReducer.cartServices];
     
     let servicetoIcrease = cartServices[serviceIndex];
@@ -137,10 +128,9 @@ export const decreaseService = async (dispatch, serviceIndex) => {
       cartServices.splice(serviceIndex, 1);
     }
     
-    console.log("added to cart", cartServices);
     dispatch({
       type: ActionTypes.ADD_TO_CART,
-      payload: cartServices,
+      payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
     });
 
   } catch (error) {
@@ -157,7 +147,7 @@ export const removeToCart = async (dispatch, serviceId) => {
   
       dispatch({
         type: ActionTypes.REMOVE_TO_CART,
-        payload: cartServices,
+        payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
       });
 
     } catch (error) {
@@ -171,10 +161,28 @@ export const removeAllToCart = async (dispatch) => {
     try {
       dispatch({
         type: ActionTypes.REMOVE_ALL_TO_CART,
-        payload: [],
+        payload: {cartServices: [], totalBill: calculateTotalBill(cartServices)},
       });
 
     } catch (error) {
       console.log(error);
     }
 };
+
+const calculateTotalBill = (cartServices) => {
+  var totalbill = 0;
+  var addonsbill = 0;
+  
+  cartServices.map( (service) => ( 
+    totalbill = (totalbill + (service.price * service.quantity ))))
+    
+  cartServices.map( (service) => ( 
+    (service.addons.length >= 1)
+    ?(service.addons.map(addons=>(
+        addonsbill = addonsbill + (addons.price * addons.quantity)
+    )))
+    :''))
+    totalbill = totalbill + addonsbill;
+
+    return totalbill;
+}

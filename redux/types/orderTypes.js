@@ -1,0 +1,6 @@
+export const ADD_SERVICES_FROM_CART = 'ADD_SERVICES_FROM_CART';
+export const HANDLE_TEXT_CHANGE = 'HANDLE_TEXT_CHANGE';
+export const START_TIME = 'START_TIME';
+export const END_TIME = 'END_TIME';
+export const FETCH_ORDERS = 'FETCH_ORDERS';
+export const UPDATE_ORDER = 'UPDATE_ORDER';
