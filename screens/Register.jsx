@@ -167,7 +167,7 @@ class Register extends Component {
       this.setState({showLoading: true})
       await this.props.registerCustomer()
       this.setState({showLoading: false})
-      this.props.navigation.dangerouslyGetParent.navigate("HomeTabs")
+      this.props.navigation.dangerouslyGetParent().navigate("HomeTabs")
     } catch (error) {
       this.setState({showLoading: false})
     }
