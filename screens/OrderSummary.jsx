@@ -25,11 +25,6 @@ const coupons = [{
     validity: new Date()
 }]
 
-const getAMPM = (hours) => {
-      
-    let ampm = hours >= 12 ? 'PM' : 'AM';
-    return ampm;
-  }
 
 
 function OrderSummary (props) {
@@ -39,8 +34,23 @@ function OrderSummary (props) {
         props.addServicesFromCart();
 
       }, []);
-      const refRBSheet = useRef();
-      const {order} = props
+
+
+      
+    const getAMPM = (hours) => {
+        
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        return ampm;
+    }
+
+    const submitOrder = async () => {
+
+        await props.submitOrder()
+        props.navigation.navigate("OrderPlaced")
+    }
+
+    const refRBSheet = useRef();
+    const {order} = props
 
     const renderApplyCoupon = () => {
         return(
@@ -105,8 +115,10 @@ function OrderSummary (props) {
                             { order.date.toDateString()}
                         </Text>
                         <Text white size={15} style={{padding: theme.sizes.base}}>
-                            {
-                                order.time.getHours() + ":" + new Date().getMinutes() + " " + getAMPM(new Date().getHours())
+                            { 
+                                (((order.time.getHours() % 12) + "" ).length === 1 ? ("0"+(order.time.getHours() % 12)) : (order.time.getHours() % 12)) + 
+                                    " : " + (((order.time.getMinutes()) + "" ).length === 1 ? ("0"+(order.time.getMinutes() )) : (order.time.getMinutes() ))  + 
+                                    "  " + getAMPM(order.time.getHours())
                             }
                         </Text>
                     </Block>
@@ -194,7 +206,7 @@ function OrderSummary (props) {
                </Block>
 
                <Block>
-                   <TouchableOpacity style={styles.button} onPress={() => props.submitOrder()}>
+                   <TouchableOpacity style={styles.button} onPress={() => submitOrder()}>
                        <Text white bold center>
                            Submit Order
                        </Text>

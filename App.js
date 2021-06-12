@@ -6,8 +6,6 @@ import store from './redux/index';
 
 import FlashMessage from "react-native-flash-message";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import IntroStackScreens from './navigation/IntroStack';
-import MainBottomTabScreens from './navigation/MainBottomTabs';
 
 import AppLoading from 'expo-app-loading';
 import { Asset, useAssets } from "expo-asset";
@@ -31,30 +29,30 @@ export default function App() {
   const [assets, error] = useAssets(images);
 
 
-  useEffect(() => {
-    const checkFirstVisit = async () => {
-      try {
-        const value = await AsyncStorage.getItem('firstTime')
-        console.log("fetched valued", value)
-        if(value == null) {
-          console.log("first_time", value)
-          AsyncStorage.setItem('firstTime',"true")
-          setFirstTime(true);
+  // useEffect(() => {
+  //   const checkFirstVisit = async () => {
+  //     try {
+  //       const value = await AsyncStorage.getItem('firstTime')
+  //       console.log("fetched valued", value)
+  //       if(value == null) {
+  //         console.log("first_time", value)
+  //         AsyncStorage.setItem('firstTime',"true")
+  //         setFirstTime(true);
       
-        }
-        else if(value == "true"){
-          console.log("Not first time", value)
-          setFirstTime(false)
-        }
-      } catch(e) {
-        // error reading value
-        console.log("Error fetching first time from local storage",error)
-      }
-    }
+  //       }
+  //       else if(value == "true"){
+  //         console.log("Not first time", value)
+  //         setFirstTime(false)
+  //       }
+  //     } catch(e) {
+  //       // error reading value
+  //       console.log("Error fetching first time from local storage",error)
+  //     }
+  //   }
   
-    checkFirstVisit();
+  //   checkFirstVisit();
    
-  },[]);
+  // },[]);
 
 
  
@@ -69,10 +67,8 @@ export default function App() {
   return (
       <Provider store={store}>
         <NavigationContainer>
-          {
-            firstTime ? <IntroStackScreens/> : <MainBottomTabScreens/>
-          }
-          <FlashMessage position="top" />
+            <AppStackScreens/>
+            <FlashMessage position="top" />
         </NavigationContainer>
       </Provider>
   );

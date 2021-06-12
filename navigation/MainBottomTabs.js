@@ -9,6 +9,9 @@ import CartStackScreens from './CartStack';
 import MenuStackScreens from './MenuStack';
 import { Block } from '../components';
 import { theme } from '../constants';
+import Cart from './../screens/Cart';
+import Menu from './../screens/Menu';
+import BookingsStackScreens from './BookingsStack';
 
 const MainBottomTabs = createBottomTabNavigator();
 
@@ -101,7 +104,7 @@ const TabBarCustomButton = ({ accessibilityState, children, onPress }) => {
             )
           }
         } />
-        <MainBottomTabs.Screen name="Bookings" component={Bookings} options={
+        <MainBottomTabs.Screen name="Bookings" component={BookingsStackScreens} options={
           {
             tabBarIcon: ({focused}) => (
               <Icon

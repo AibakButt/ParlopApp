@@ -139,7 +139,7 @@ function Services(props) {
   }
 
   const addAddonsToServiceToCart = (addon, serviceId) => {
-    console.log("asdafsa",addon,serviceId)
+   
     props.addAddOns(addon,serviceId);
   }
 

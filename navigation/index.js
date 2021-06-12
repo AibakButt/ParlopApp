@@ -1,8 +1,8 @@
-import React, {useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import { createStackNavigator } from '@react-navigation/stack';
 import IntroStackScreens from './IntroStack';
-import MainBottomTabScreens from './MainBottomTabs';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import MainStackScreens from './MainStack';
 
 
 const defaultOptions = {
@@ -11,45 +11,42 @@ const defaultOptions = {
 
 const AppStack = createStackNavigator();
 
-// const checkFirstVisit = () => {
+
+
+
+function AppStackScreens() {
+
+  const [firstTime, setFirstTime] = useState(true);
   
-//   const [value, setValue] = useState(false)
-
-//   try {
-//     let value = AsyncStorage.getItem('firstVisit')
-//     console.log('value',value)
-//     if(value === null){
-//        AsyncStorage.setItem('firstVisit', "true")
-//       value = true
-//       console.log("Setting First time to true ")
-//     }else{
-//        AsyncStorage.setItem('firstVisit', "false")
-//       console.log("Setting First time to false ")
-//       value = false
-//     }
-//     console.log('return value', value)
-    
-//   } catch (error) {
-//    console.log('Error in fetching first visit (App.js): ', error)
-//   }
-
+  useEffect(() => {
+    const checkFirstVisit = async () => {
+      try {
+        const value = await AsyncStorage.getItem('firstTime')
+        console.log("firstTime fetched value (if true means, app opening first time): ", value)
+        if(value == null) {
+          console.log("first_time", value)
+          AsyncStorage.setItem('firstTime',"true")
+          setFirstTime(true);
+      
+        }
+        else if(value == "true"){
+          console.log("Not first time", value)
+          setFirstTime(false)
+        }
+      } catch(e) {
+        // error reading value
+        console.log("Error fetching first time from local storage",error)
+      }
+    }
   
-// }
+    checkFirstVisit();
+   
+  },[]);
 
-
-
-async function AppStackScreens() {
-  
   return (
     <AppStack.Navigator >
-      {
-      
-         checkFirstVisit() ? (
-          <AppStack.Screen name="IntroStack" component={IntroStackScreens} options={defaultOptions}/>
-        ): (
-          <AppStack.Screen name="MainTab" component={MainBottomTabScreens} options={defaultOptions}/>
-        )
-      }
+        { firstTime && <AppStack.Screen name="IntroStack" component={IntroStackScreens} options={defaultOptions}/> }
+        { !firstTime && <AppStack.Screen name="MainTab" component={MainStackScreens} options={defaultOptions}/> }
     </AppStack.Navigator>
   );
 }

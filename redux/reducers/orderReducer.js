@@ -30,6 +30,10 @@ export const orderReducer = (state = initialState, action) => {
       return { ...state, order: action.payload };
     case ActionTypes.FETCH_ORDERS:
       return { ...state, orders: action.payload}
+    case ActionTypes.START_TIME:
+      return { ...state, orders: action.payload}
+    case ActionTypes.END_TIME:
+      return { ...state, orders: action.payload}
     
     default:
       return state;

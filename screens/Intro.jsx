@@ -122,19 +122,32 @@ class Intro extends Component {
           {this.renderIllustrations()}
           {this.renderSteps()}
         </Block>
-        <Block middle flex={0.25} margin={[0, theme.sizes.padding * 2]}>
+        {
+          this.props.route.params && this.props.route.params.buttonShown ? (
+            <Block middle flex={0.25} margin={[0, theme.sizes.padding * 2]}>
+                <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.goBack()} >
+                  <Text center bold white>
+                    Done
+                  </Text>
+                </TouchableOpacity>
+            </Block>
+          ) : (
+            <Block middle flex={0.25} margin={[0, theme.sizes.padding * 2]}>
          
-          <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Register')} >
-            <Text center bold white>
-              Register Now
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonOutline} onPress={() => this.props.navigation.navigate('MainTab')} >
-            <Text center bold accent>
-              Skip to Home
-            </Text>
-          </TouchableOpacity>
-        </Block>
+              <TouchableOpacity style={styles.button} onPress={() => this.props.navigation.navigate('Auth')} >
+                <Text center bold white>
+                  Register Now
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.buttonOutline} onPress={() =>  this.props.navigation.replace('HomeTabs')} >
+                <Text center bold accent>
+                  Skip to Home
+                </Text>
+              </TouchableOpacity>
+            </Block>
+          )
+        }
+        
       </Block>
     );
   }
