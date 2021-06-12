@@ -67,14 +67,33 @@ export const submitOrder = async (dispatch) => {
   try {
     let order = {...store.getState().orderReducer.order};
     order.service.forEach(ser => {
-      console.log("-------------",ser)
       ser.category = ser.category._id
      } )
 
     order.customerId = (await getCurrentCustomer()).id
-    console.log(order)
     const { data } = await axios.post(apiEndPoint,order)
-    console.log(data)
+    console.log("Your order is submitted...:",order)
+
+     //Reset order data
+      order.date= new Date()
+      order.time= new Date()
+      order.service= []
+      order.orderTotal= 0
+      order.discount= 0
+      order.coupon= ""
+      order.address= ""
+      order.area= ""
+      order.phone= ""
+      order.price= ""
+      order.start_time= ""
+      order.end_time= ""
+      order.specialInstructions= ""
+      order.travelCharges= 0
+     
+      dispatch({
+        type: ActionTypes.UPDATE_ORDER,
+        payload: order,
+      });
 
   } catch (error) {
     console.log(error)
@@ -83,11 +102,13 @@ export const submitOrder = async (dispatch) => {
 
 export const startServiceTime = async (dispatch, order) => {
   try {
-    await axios.put(apiEndPoint+order._id, {start_time: new Date()})
+    await axios.put(apiEndPoint+ "/" +order._id, {start_time: new Date()})
     
     let orders = [...store.getState().orderReducer.orders];
-    let index = categories.findIndex(a => a._id === order._id);
-    orders[index].startTime = new Date();
+    let index = orders.findIndex(a => a._id === order._id);
+    orders[index].start_time = new Date();
+    orders[index].status = "Working";
+    console.log("Order Updated",orders[index])
 
     dispatch({
       type: ActionTypes.START_TIME,
@@ -101,11 +122,13 @@ export const startServiceTime = async (dispatch, order) => {
 
 export const endServiceTime = async (dispatch, order) => {
   try {
-    await axios.put(apiEndPoint+order._id, {end_time: new Date()})
-    
+    const {data} = await axios.put(apiEndPoint+"/"+order._id, {end_time: new Date()})
+    console.log(data)
     let orders = [...store.getState().orderReducer.orders];
-    let index = categories.findIndex(a => a._id === order._id);
-    orders[index].endTime = new Date();
+    let index = orders.findIndex(a => a._id === order._id);
+    orders[index].end_time = new Date();
+    orders[index].status = "Completed";
+    console.log("Order Completed",orders[index])
 
     dispatch({
       type: ActionTypes.END_TIME,

@@ -184,10 +184,10 @@ export async function getCurrentCustomer() {
   try {
     const jwt = await AsyncStorage.getItem("customer");
     let customer = await jwtDecode(JSON.parse(jwt));
-    // console.log(customer)
+    console.log("Customer token fetched from local storage", customer)
     return customer
   } catch (err) {
-    console.log("Error in fetch jwt token from local storage:", err)
+    console.log("Error in fetch customer token from local storage:", err)
     return null;
   }
 }

@@ -1,18 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, Badge, Button, Block, Text } from "../components";
 import { connect } from 'react-redux';
 import { theme } from "../constants";
-import { SafeAreaView, StyleSheet, ScrollView, Image } from 'react-native';
+import { SafeAreaView, StyleSheet, ScrollView, Image, Alert } from 'react-native';
 import { TouchableOpacity } from 'react-native';
 import { Platform, NativeModules } from 'react-native';
 import Icon from "../components/Icon";
 import {  increaseAddOns , decreaseAddOns, increaseService,decreaseService} from './../redux/actions/cartActions';
+import { getCurrentCustomer } from "../redux/actions/authentication";
 
 const { StatusBarManager } = NativeModules;
 
 
 const Cart = (props) => {
+
+    const [customer, setCustomer] = useState(null)
+
+    useEffect( () => {
+        const getCustomer = async () => {
+            try {
+                setCustomer(await getCurrentCustomer())
+            } catch (error) {
+                console.log(error)
+            }
+        }
+        getCustomer()
+        
+    }, []);
+
     const {cartServices} = props;
+
+    const checkLogin = () => {
+        console.log("Customer in cart" , customer)
+        if(!customer){
+            Alert.alert(
+                "Login",
+                "You need to login to complete order",
+                [
+                  {
+                    text: "Login",
+                    onPress: () => props.navigation.dangerouslyGetParent().dangerouslyGetParent().navigate("Auth", { from: "Cart"})
+                  },
+                  {
+                    text: "Cancel",
+                    onPress: () => console.log("Cancel Pressed"),
+                    style: "cancel"
+                  },
+                ]
+              );
+        }
+        if(customer){
+            props.navigation.navigate("ScheduleOrder")
+        }
+    }
     
     if(cartServices && cartServices.length === 0 ){
         return(
@@ -117,7 +157,7 @@ const Cart = (props) => {
                
                 </Block>
                 <Block flex={1} style={{marginBottom: theme.sizes.base* 1.4, marginHorizontal: 10}} >
-                    <Button onPress={() => props.navigation.navigate("ScheduleOrder")} color={theme.colors.accent} style={{borderRadius: 12}}><Text center white bold>Schedule your order</Text></Button>
+                    <Button onPress={() => checkLogin() } color={theme.colors.accent} style={{borderRadius: 12}}><Text center white bold>Schedule your order</Text></Button>
                 </Block>
             </Block>
      

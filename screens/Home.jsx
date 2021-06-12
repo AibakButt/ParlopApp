@@ -29,14 +29,15 @@ const { width, height } = Dimensions.get("window");
 
 function Home(props) {
  
-  const [active, setActive]  = useState("Products")
-  const [city, setCity] = useState("lahore");
+  const [city, setCity] = useState("Lahore");
 
   const handleCitySelect = (value) => {
-    if(value !== "lahore"){
+
+    if(value !== "Lahore"){
       alert("Sorry! our services are currently available in Lahore")
-      setCity("Lahore")
     }
+    setCity("Lahore")
+
   }
     
   let scrollX = new Animated.Value(0);
@@ -65,7 +66,7 @@ function Home(props) {
         renderItem={({ item }) => (
 
             <Block middle center >
-              {console.log(item)}
+              
               <Image
                 source={{ uri: item.image}}
                 resizeMode="contain"
@@ -122,7 +123,7 @@ function Home(props) {
                     useNativeAndroidPickerStyle={false}
                     onValueChange={(value) => handleCitySelect(value)}
                     items={[
-                        {label: 'Lahore', value: 'lahore' },
+                        {label: 'Lahore', value: 'Lahore' },
                         {label: 'Islamabad', value: 'Islamabad' },
                         {label: 'Rawalpindi', value: 'Rawalpindi' },
                         {label: 'Karachi', value: 'Karachi' },

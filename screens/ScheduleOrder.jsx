@@ -47,6 +47,10 @@ function ScheduleOrder(props) {
 
     const onChangeDate = (selectedDate) => {
         setShowDatePicker(false);
+        
+        //when cancel button press
+        if(!selectedDate) return 
+
         let now  = new Date()
         if(selectedDate.getDay() < now.getDay()){
             showMessage({
@@ -62,15 +66,27 @@ function ScheduleOrder(props) {
     }
 
     const onChangeTime = (selectedTime) => {
+
+        //when cancel button press
+        if(!selectedTime) return 
+
         const currentTime = selectedTime || time;
         setShowTimePicker(false);
         let now  = new Date()
         let sameDay = date.getDay() === now.getDay()
 
         if(sameDay){
+            //selected time on a same day should greater than now...
+            if(selectedTime.getHours() < new Date().getHours()){
+                showMessage({
+                    message: "On a same day time, selected time should be greater than now",
+                    type: "danger",
+                    floating: true
+                  });
+            }
             if(selectedTime.getHours() >= 4 && selectedTime.getHours() <= 16 ){
                 setTime(currentTime);
-                props.handleTextChange(selectedDate,"time")
+                props.handleTextChange(selectedTime,"time")
             }
             else{
                 showMessage({
@@ -83,7 +99,7 @@ function ScheduleOrder(props) {
         else{
             if(selectedTime.getHours() >= 8 && selectedTime.getHours() <= 20 ){
                 setTime(currentTime);
-                props.handleTextChange(selectedDate,"time")
+                props.handleTextChange(selectedTime,"time")
             }
             else{
                 showMessage({
@@ -102,6 +118,44 @@ function ScheduleOrder(props) {
         return ampm;
       }
    
+    const validate = () => {
+        const { order } = props;
+        if(order.date == ""){
+            showMessage({
+                message: "Please select the date",
+                type: "error",
+                floating: true
+            });
+            return
+        }   
+        if(order.time == ""){
+            showMessage({
+                message: "Please select the time",
+                type: "error",
+                floating: true
+            });
+            return
+        }
+        
+        if(order.address == ""){
+            showMessage({
+                message: "Please enter the address",
+                type: "error",
+                floating: true
+            });
+            return
+        }
+        if(order.area == ""){
+            showMessage({
+                message: "Please select the area",
+                type: "error",
+                floating: true
+            });
+            return
+        }
+        
+        props.navigation.push("OrderSummary")
+    } 
 
     const {order} = props;
     
@@ -114,13 +168,13 @@ function ScheduleOrder(props) {
                         <Text style={styles.text}>Select Date</Text>
                         <TouchableOpacity  onPress={()=>setShowDatePicker(true)} >
                             <Block row color={theme.colors.white} space="between" style={{marginHorizontal: theme.sizes.base, borderRadius :12}}>
-                                <Text style={[styles.select , {textAlign: 'center'}]}>{ date.toDateString().split(' ')[1] + ". " + date.getDate() + ",  " + days[date.getDay()]}</Text>
+                                <Text style={[styles.select , {textAlign: 'center', paddingTop: 12}]}>{ date.toDateString().split(' ')[1] + ". " + date.getDate() + ",  " + days[date.getDay()]}</Text>
                                 <Icon
                                     name={'plus'}
                                     type={ 'entypo'}
                                     size={26}
                                     color={theme.colors.black}
-                                    style={styles.select}
+                                    style={[styles.select, {paddingTop: 12}]}
                                 />
                             </Block>
                         </TouchableOpacity>
@@ -141,18 +195,20 @@ function ScheduleOrder(props) {
                         <Text style={styles.text}>Select Time</Text>
                         <TouchableOpacity  onPress={()=>setShowTimePicker(true)} >
                             <Block row color={theme.colors.white} space="between" style={{marginHorizontal: theme.sizes.base, borderRadius :12}}>
-                                <Text style={[styles.select , {textAlign: 'center'}]}>
-                                    { (((time.getHours() % 12) + "" ).length === 1 ? ("0"+(time.getHours() % 12)) : (time.getHours() % 12)) + 
-                                    " : " + (((time.getMinutes()) + "" ).length === 1 ? ("0"+(time.getMinutes() )) : (time.getMinutes() ))  + 
-                                    "  " + getAMPM(time.getHours())}
-                                </Text>
-                                <Icon
-                                    name={'plus'}
-                                    type={ 'entypo'}
-                                    size={26}
-                                    color={theme.colors.black}
-                                    style={styles.select}
-                                />
+                               
+                                    <Text style={[styles.select , {textAlign: 'center', paddingTop: 12}]}>
+                                        { (((time.getHours() % 12) + "" ).length === 1 ? ("0"+(time.getHours() % 12)) : (time.getHours() % 12)) + 
+                                        " : " + (((time.getMinutes()) + "" ).length === 1 ? ("0"+(time.getMinutes() )) : (time.getMinutes() ))  + 
+                                        "  " + getAMPM(time.getHours())}
+                                    </Text>
+                                    <Icon
+                                        name={'plus'}
+                                        type={ 'entypo'}
+                                        size={26}
+                                        color={theme.colors.black}
+                                        style={[styles.select, {paddingTop: 12}]}
+                                    />
+                               
                             </Block>
                         </TouchableOpacity>
                         {
@@ -171,6 +227,8 @@ function ScheduleOrder(props) {
                         <Text style={styles.text}>Contact Number</Text>
                         <Block row style={{marginHorizontal: theme.sizes.base}}>
                             <TextInput
+                                keyboardType="numeric"
+                                maxLength={10}
                                 style={[styles.phoneInput, {width: '20%', color: 'black', borderTopLeftRadius: 12,borderBottomLeftRadius: 12,}]}
                                 value="+92"
                                 editable={false}
@@ -181,6 +239,8 @@ function ScheduleOrder(props) {
                                 onChangeText={(value) => props.handleTextChange("phone",value)}
                                 placeholder="Phone Number"
                                 value={customer && customer.phone? customer.phone.substr(2,customer.phone.length-1): order.phone}
+                                keyboardType="numeric"
+                                maxLength={10}
                             />
                         </Block>
                     </Block>
@@ -189,7 +249,7 @@ function ScheduleOrder(props) {
                         <TextInput
                             style={styles.textInput}
                             onChangeText={(value) => props.handleTextChange("address",value)}
-                            placeholder="Home Address"
+                            placeholder="Block XYZ Street 123, Johar Town, Lahore"
                             multiline
                             numberOfLines={3}
                             value={order.address}
@@ -233,7 +293,7 @@ function ScheduleOrder(props) {
                 </ScrollView>
             </Block>
             <Block flex={0.1} >
-                <TouchableOpacity style={styles.orderButton} onPress={() => props.navigation.push("OrderSummary")}>
+                <TouchableOpacity style={styles.orderButton} onPress={() => validate()}>
                    
                         <Text white size={16} bold center> 
                             Place your order

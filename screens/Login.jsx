@@ -153,24 +153,17 @@ class Register extends Component {
       this.setState({showLoading: true})
       await this.props.sendVerificationCodeAndLogin()
       this.setState({showLoading: false, nameShow: true})
+      console.log(this.props.route.params)
+      this.props.navigation.dangerouslyGetParent().navigate("HomeTabs")
+
     } catch (error) {
+      console.log(error)
       this.setState({showLoading: false})
     }
 
   }
 
-  registerCustomer = async () => {
-
-    try {
-      this.setState({showLoading: true})
-      await this.props.registerCustomer()
-      this.setState({showLoading: false})
-      this.props.navigation.navigate("MainTab")
-    } catch (error) {
-      this.setState({showLoading: false})
-    }
-
-  }
+ 
   
   renderPhoneInput = () => {
     return (
@@ -187,6 +180,7 @@ class Register extends Component {
                 placeholder="Phone Number"
                 value={this.props.auth.phoneNumber}
                 keyboardType='numeric'
+                maxLength={10}
             />
         </Block>
         <Block>
@@ -216,6 +210,7 @@ class Register extends Component {
       <Block>
         <TextInput
             keyboardType='numeric'
+            maxLength={4}
             placeholder="Code"
             value={this.props.auth.code}
             onChangeText={(e) => {this.props.handleTextChange(e,'code')}}

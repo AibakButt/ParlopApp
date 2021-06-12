@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from './../components/index';
-import { TouchableOpacity, useWindowDimensions, NativeModules, Platform, StyleSheet, ScrollView, Animated, Modal, Image} from 'react-native';
+import { TouchableOpacity, useWindowDimensions, NativeModules, Platform, StyleSheet, ScrollView, Animated, Image, Dimensions} from 'react-native';
 import {Collapse, CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import { theme } from '../constants';
 import Icon from '../components/Icon';
+import Modal from 'react-native-modal';
 import { endServiceTime, startServiceTime, fetchOrders } from './../redux/actions/orderActions';
-
+const { width, height } = Dimensions.get("window");
 
 const { StatusBarManager } = NativeModules;
 
@@ -21,30 +22,36 @@ const Bookings = (props) => {
 
     const [modalShow, setModalShow] = useState(null)
 
+    const getAMPM = (hours) => {
+      
+        let ampm = hours >= 12 ? 'PM' : 'AM';
+        return ampm;
+    }
+    
     const renderEmployeeData = (booking) => {
         return (
             <Modal
                 transparent={false}
-                visible={modalShow === booking.orderNo}
+                isVisible={modalShow === booking.orderNo}
                 style={styles.modalView}
             >
-                <Block padding={theme.sizes.base} style={{borderBottomColor: theme.colors.gray2, borderBottomWidth: 1}}>
-                    <Block >
+                <Block padding={theme.sizes.base} >
+                    <Block flex={1} row right  style={{borderBottomColor: theme.colors.gray2, borderBottomWidth: 1}}>
                         <Icon
-                        name="close"
-                        color={theme.colors.accent}
-                        backgroundColor="white"
-                        onPress={() => setModalShow(null)}
-                        size={22}
+                            name="close"
+                            color={theme.colors.accent}
+                            backgroundColor="white"
+                            onPress={() => setModalShow(null)}
+                            size={22}
                         /> 
                     </Block>
-                    <Block center>
-                        <Image source={{uri: booking.employee.profilePicture}} style={{width: 100, height: 100, borderRadius: 50}} />
+                    <Block flex={6} center paddingTop={theme.sizes.body}>
+                        <Image source={{uri: booking.employee.profilePicture}} style={{width: 150, height: 150, borderRadius: 75}} />
+                        <Text style={{paddingVertical: theme.sizes.body}} bold>{booking.employee.name}</Text>
                     </Block>
-                    <Block center>
-                        <Text>{booking.employee.name}</Text>
-                        <Text>{booking.employee.email}</Text>
-                        <Text>{booking.employee.phone}</Text>
+                    <Block flex={3} center>
+                        <Text><Text bold>Email: </Text>{booking.employee.email}</Text>
+                        <Text><Text bold>Phone: </Text>+{booking.employee.phone}</Text>
                     </Block>
                 </Block>
             </Modal>    
@@ -113,12 +120,19 @@ const Bookings = (props) => {
     const renderBookingCard = (booking) => {
         return (
             
-                    <Block key={booking.code} color={theme.colors.white} padding={theme.sizes.base} margin={[theme.sizes.base * 0.5,theme.sizes.base,theme.sizes.base*0.5,theme.sizes.base]} style={{borderRadius: 12}}>
+                    <Block key={booking._id} color={theme.colors.white} padding={theme.sizes.base} margin={[theme.sizes.base * 0.5,theme.sizes.base,theme.sizes.base*0.5,theme.sizes.base]} style={{borderRadius: 12}}>
                         {booking && booking.employee && renderEmployeeData(booking)}
                         <Block row space="between">
                             <Block>
-                                <Text size={17} bold>Order No. {booking.orderNo}</Text>
-                                <Text size={12} >Order Date. {new Date(booking.date).toLocaleDateString() + " at " + new Date(booking.time).toLocaleDateString()}</Text>
+                                <Block row center>
+                                    <Text size={17} bold>Order No. {booking.orderNo}</Text>
+                                    <Text  gray bold size={10}> {booking.status}</Text>
+                                </Block>
+                                <Text size={12} >Order Date. {new Date(booking.date).toLocaleDateString() + " at " + 
+                                (((new Date(booking.time).getHours() % 12) + "" ).length === 1 ? ("0"+(new Date(booking.time).getHours() % 12)) : (new Date(booking.time).getHours() % 12)) + 
+                                    ":" + (((new Date(booking.time).getMinutes()) + "" ).length === 1 ? ("0"+(new Date(booking.time).getMinutes() )) : (new Date(booking.time).getMinutes() ))  + 
+                                    "  " + getAMPM(new Date(booking.time).getHours())
+                            }</Text>
                             
                             </Block>
                             
@@ -130,16 +144,32 @@ const Bookings = (props) => {
                         </Block>
                         <Block row space="between" paddingTop={theme.sizes.base*0.75}>
                             <TouchableOpacity onPress={() => setModalShow(booking.orderNo)}>
-                                <Text gray center>Beauticain: <Text bold black>{booking.employee ? booking.employee.name : "Pending..."}</Text></Text>
+                                <Text gray center>Beauticain: <Text bold black>{booking.employee ? booking.employee.name : booking.status}</Text></Text>
                             </TouchableOpacity>
                             <Text center>Total: <Text bold >Rs.</Text><Text bold accent>{booking.orderTotal}</Text></Text>
                         </Block>
-                        <Block center marginTop={theme.sizes.body}>
-                            <Text style={{alignSelf: 'flex-start'}} size={12} gray>When your beautician arrives press the start button</Text>
-                            <TouchableOpacity style={styles.startButton} onPress={()=>{}}>
-                                <Text style={{marginVertical: 3}} center white size={16}>Start</Text>
-                            </TouchableOpacity>
-                        </Block>
+                        {
+                            booking.start_time && booking.start_time !== "" ? (
+                                <Block center marginTop={theme.sizes.body}>
+                                    
+                                    <Text style={{alignSelf: 'flex-start'}} size={12} gray>Beautician started service started at <Text bold>{(((new Date(booking.start_time).getHours() % 12) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getHours() % 12)) : (new Date(booking.start_time).getHours() % 12)) + 
+                                    ":" + (((new Date(booking.start_time).getMinutes()) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getMinutes() )) : (new Date(booking.start_time).getMinutes() ))  + 
+                                    "  " + getAMPM(new Date(booking.start_time).getHours())}</Text></Text>
+                                    <TouchableOpacity style={styles.startButton} onPress={() => props.endServiceTime(booking)}>
+                                        <Text style={{marginVertical: 3}} center white size={16}>End</Text>
+                                    </TouchableOpacity>
+                                </Block>
+                            ) : (
+                                <Block center marginTop={theme.sizes.body}>
+                                    
+                                    <Text style={{alignSelf: 'flex-start'}} size={12} gray>When your beautician arrives press the start button</Text>
+                                    <TouchableOpacity style={styles.startButton} onPress={() => props.startServiceTime(booking) }>
+                                        <Text style={{marginVertical: 3}} center white size={16}>Start</Text>
+                                    </TouchableOpacity>
+                                </Block>
+                                
+                            )
+                        }
                         <Collapse>
                             <CollapseHeader>
                                 <Block style={{ borderTopWidth: 1, borderColor: theme.colors.gray, padding: 5}} center >
@@ -183,8 +213,8 @@ const Bookings = (props) => {
                 <Block color={theme.colors.gray2}>
                     <ScrollView>
                         {
-                            props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').map(booking => (
-                                renderBookingCard(booking)
+                            props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').map((booking ,index) => (
+                               renderBookingCard(booking)
                             ))
                         }
                     </ScrollView>
@@ -208,7 +238,15 @@ const Bookings = (props) => {
             )       
         }
         return (
-            <Block style={{ flex: 1, backgroundColor: '#673ab7' }} />
+            <Block color={theme.colors.gray2}>
+                    <ScrollView>
+                        {
+                            props.bookings && props.bookings.filter(booking => booking.status==='Cancel' || booking.status === 'Completed' ).map((booking, index) => (
+                               renderBookingCard(booking)
+                            ))
+                        }
+                    </ScrollView>
+            </Block>
         )    
     };
 
@@ -265,8 +303,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     fetchBookings: () => fetchOrders(dispatch),
-    startServiceTime: () => startServiceTime(dispatch),
-    endServiceTime: () => endServiceTime(dispatch)
+    startServiceTime: (booking) => startServiceTime(dispatch, booking),
+    endServiceTime: (booking) => endServiceTime(dispatch, booking)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Bookings)
@@ -289,8 +327,9 @@ const styles = StyleSheet.create({
     },
     modalView: {
         margin: theme.sizes.base*3,
+        marginVertical: height/4,
         backgroundColor: theme.colors.white,
-        borderRadius: 20,
+        borderRadius: 20, 
         shadowColor: "#000",
         shadowOffset: {
           width: 0,
