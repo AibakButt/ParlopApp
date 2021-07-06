@@ -69,6 +69,7 @@ class Register extends Component {
     this.state = {
         codeFeildShow: false,
         nameShow: false,
+        showTextInput: 'phone',
         showLoading: false
     }
 
@@ -137,14 +138,27 @@ class Register extends Component {
   }
 
   sendPhoneNo = async () => {
+
+    if((this.props.auth.phone).length !== 10 || this.props.auth.phone.charAt(0) != '3'){
+      showMessage({
+        message: "Phone number is not valid",
+        type: "danger",
+        floating: true
+      });
+      this.props.handleTextChange("", 'phone')
+      return
+    } 
+
     try {
       this.setState({showLoading: true})
       await this.props.sendPhoneNo()
-      this.setState({showLoading: false, codeFeildShow: true})
+      this.setState({showLoading: false, showTextInput: 'code'})
     } catch (error) {
       this.setState({showLoading: false})
       console.log(error)
     }
+
+   
     
 
   }
@@ -154,7 +168,7 @@ class Register extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.sendVerificationCode()
-      this.setState({showLoading: false, nameShow: true})
+      this.setState({showLoading: false, nameShow: 'password'})
     } catch (error) {
       this.setState({showLoading: false})
     }
@@ -167,10 +181,15 @@ class Register extends Component {
       this.setState({showLoading: true})
       await this.props.registerCustomer()
       this.setState({showLoading: false})
-      this.props.navigation.dangerouslyGetParent().navigate("HomeTabs")
+      this.props.navigation.dangerouslyGetParent().replace("HomeTabs")
+      //Reset feilds
+      this.props.handleTextChange("", 'phone')
+      this.props.handleTextChange("", 'code')
+      this.props.handleTextChange("", 'name')
     } catch (error) {
       this.setState({showLoading: false})
     }
+
 
   }
   
@@ -186,7 +205,7 @@ class Register extends Component {
             <TextInput
                 style={[styles.phoneInput, {width: '80%', height: 50, color: 'black', letterSpacing: 4, borderTopRightRadius: 12,borderBottomRightRadius: 12,}]}
                 onChangeText={(e) => this.props.handleTextChange(e, 'phone')}
-                placeholder="Phone Number"
+                placeholder="3XX XXXXXXX"
                 value={this.props.auth.phoneNumber}
                 keyboardType='numeric'
                 maxLength={10}
@@ -278,6 +297,29 @@ class Register extends Component {
     )
   }
 
+  renderPasswordInput = () => {
+    return (
+      <Block>
+          <TextInput
+              placeholder="Password"
+              value={this.props.auth.password}
+              onChangeText={(e) => this.props.handleTextChange(e,"password")}
+              style={styles.textInput}
+          />
+          <Block row middle marginTop={theme.sizes.base}>
+              <Block>
+                  <TouchableOpacity style={styles.next} onPress={() => this.setState({showTextInput: 'name'})}>
+                    <Text bold white>
+                      Next
+                    </Text>
+                  </TouchableOpacity>
+              </Block>
+              
+          </Block>
+      </Block>
+    )
+  }
+
   render() {
     return (
       <KeyboardAvoidingView
@@ -333,20 +375,17 @@ class Register extends Component {
                     </TapGestureHandler>
             
             {
-                this.state.nameShow ? (
-                    this.renderNameInput()
-                ) : (
-                    this.state.codeFeildShow ? (
-                        this.renderCodeInput()
-                      ) : (
-                        this.renderPhoneInput()
-                      )
-                )
+              this.state.showTextInput === 'phone' && this.renderPhoneInput()
             }
-            
-            
-            
-            
+            {
+              this.state.showTextInput === 'code' && this.renderCodeInput()
+            }
+            {
+              this.state.showTextInput === 'password' && this.renderPasswordInput()
+            }
+            {
+              this.state.showTextInput === 'name' && this.renderNameInput()
+            }
             
           </Animated.View>
         </View>
@@ -415,7 +454,6 @@ const styles = StyleSheet.create({
       marginVertical: 5,
       borderColor: 'rgba(0,0,0,0.2)',
       textAlign: 'center',
-     
       letterSpacing: 10
   },
   next: {

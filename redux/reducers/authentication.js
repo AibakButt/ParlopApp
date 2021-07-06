@@ -5,6 +5,7 @@ let initialState = {
         phone: '',
         code: '',
         name: '',
+        password: '',
     }
 };
 

@@ -1,5 +1,6 @@
 import store from "../index";
 import * as ActionTypes from "../types/cartTypes";
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 export const addToCart = async (dispatch, service) => {
     try {
@@ -17,6 +18,12 @@ export const addToCart = async (dispatch, service) => {
       dispatch({
         type: ActionTypes.ADD_TO_CART,
         payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
+      });
+
+      showMessage({
+        message: "Service Added to Cart",
+        type: "success",
+        floating: true
       });
 
     } catch (error) {
@@ -57,6 +64,8 @@ export const addAddOns= async (dispatch, addons, serviceId) => {
       type: ActionTypes.ADD_TO_CART,
       payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
     });
+
+    
 
   } catch (error) {
     console.log(error);
@@ -148,6 +157,12 @@ export const removeToCart = async (dispatch, serviceId) => {
       dispatch({
         type: ActionTypes.REMOVE_TO_CART,
         payload: {cartServices: cartServices, totalBill: calculateTotalBill(cartServices)},
+      });
+
+      showMessage({
+        message: "Service Removed from Cart",
+        type: "success",
+        floating: true
       });
 
     } catch (error) {

@@ -19,91 +19,6 @@ import Icon from './../components/Icon';
 
 const { width, height } = Dimensions.get("window");
 
-const myservices = [{
-  _id: "6080576ea9b0a300042f7608",
-  name: "Acne facial",
-  category: {
-      _id: "6080570ca9b0a300042f7602",
-      name: "Facial",
-      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      created_at: "2021-04-21T16:47:08.090Z",
-      updatedAt: "2021-04-21T16:47:08.090Z"
-   
-  },
-  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
-  price: 300,
-  availability: true,
-  addons: [
-    { name: "Extra 1 ", price: 200},
-    { name: "Extra 2 ", price: 300},
-    { name: "Extra 3 ", price: 500},
-  ],
- 
-},{
-  _id: "6080576ea9b0a300042f7609",
-  name: "Acne facial 2 ",
-  category: {
-      _id: "6080570ca9b0a300042f7602",
-      name: "Facial",
-      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      created_at: "2021-04-21T16:47:08.090Z",
-      updatedAt: "2021-04-21T16:47:08.090Z"
-   
-  },
-  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
-  price: 500,
-  availability: true,
-  addons: [
-    { name: "Extra 4 ", price: 200},
-    { name: "Extra 5 ", price: 300},
-    { name: "Extra 6 ", price: 500},
-  ],
- 
-},{
-  _id: "6080576ea9b0a300042f7609",
-  name: "Acne facial 2 ",
-  category: {
-      _id: "6080570ca9b0a300042f7602",
-      name: "Facial",
-      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      created_at: "2021-04-21T16:47:08.090Z",
-      updatedAt: "2021-04-21T16:47:08.090Z"
-   
-  },
-  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
-  price: 500,
-  availability: true,
-  addons: [
-    { name: "Extra 4 ", price: 200},
-    { name: "Extra 5 ", price: 300},
-    { name: "Extra 6 ", price: 500},
-  ],
- 
-},{
-  _id: "6080576ea9b0a300042f7609",
-  name: "Acne facial 2 ",
-  category: {
-      _id: "6080570ca9b0a300042f7602",
-      name: "Facial",
-      picture: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      icon: "https://www.beautysecrets.com.pk/assets/images/our-services/large/facial.jpg",
-      created_at: "2021-04-21T16:47:08.090Z",
-      updatedAt: "2021-04-21T16:47:08.090Z"
-   
-  },
-  description: "We have a team of experienced & professional beauty expert that use most advance & a custom technique to offer soft, smooth & fresh face for every everyone.",
-  price: 500,
-  availability: true,
-  addons: [
-    { name: "Extra 4 ", price: 200},
-    { name: "Extra 5 ", price: 300},
-    { name: "Extra 6 ", price: 500},
-  ],
- 
-}]
 
 function Services(props) {
   
@@ -182,6 +97,7 @@ function Services(props) {
                     size={22}
                   /> 
               </Block>
+              
             </Block>
             <Block center middle flex={1} color={theme.colors.white}> 
                 <Image source={require('../assets/images/no-addon.jpg')} style={{width: 70, height: 70}} />
@@ -222,23 +138,24 @@ function Services(props) {
                       <Block color="white" row key={index} shadow style={styles.service}>
                         <Block flex={8}>
                           <Text medium height={20} size={18}>
-                              {addon.name}
+                              {addon['name'+index]}
                           </Text>
                           <Text accent size={15} style={{paddingVertical: 5}}>
-                                  Rs. {addon.price}
+                                  Rs. {addon['price'+index]}
                               </Text>
                           </Block>
                           <Block flex={2} center middle>
-                            <TouchableOpacity style={styles.actionButton} disabled={isAddonInCart(ser_id, addon.name)} onPress={() => addAddonsToServiceToCart({name:addon.name,price:addon.price,quantity:1},ser_id)}>
+                            <TouchableOpacity style={styles.actionButton} disabled={isAddonInCart(ser_id, addon['name'+index])} onPress={() => addAddonsToServiceToCart({name:addon['name'+index],price:addon['price'+index],quantity:1},ser_id)}>
                               <Icon
-                                name={isAddonInCart(ser_id, addon.name) ? 'done':'plus'}
-                                type={isAddonInCart(ser_id, addon.name)  ? 'material': 'materialCommunity'}
+                                name={isAddonInCart(ser_id, addon['name'+index]) ? 'done':'plus'}
+                                type={isAddonInCart(ser_id, addon['name'+index])  ? 'material': 'materialCommunity'}
                                 size={22}
                                 color={theme.colors.accent}
                               />
                               
                             </TouchableOpacity>
                           </Block>
+                          
                       </Block>
               
                   ))
@@ -261,7 +178,6 @@ function Services(props) {
             <Block flex={false} margin={10}>
                 <FlatList
                     horizontal
-                    pagingEnabled
                     showsHorizontalScrollIndicator={false}
                     data={categories}
                     renderItem={({ item }) => renderTab(item)}

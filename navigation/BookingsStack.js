@@ -5,11 +5,13 @@ import OrderCompleted from './../screens/OrderCompleted';
 
 
 const BookingsStack = createStackNavigator();
-
+const defaultOptions = {
+  headerShown: false
+}
 function BookingsStackScreens() {
     return (
       <BookingsStack.Navigator>
-        <BookingsStack.Screen name="Bookings" component={Bookings} />
+        <BookingsStack.Screen name="Bookings" component={Bookings} options={defaultOptions}/>
         <BookingsStack.Screen name="OrderCompleted" component={OrderCompleted} />
       </BookingsStack.Navigator>
     );

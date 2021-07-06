@@ -46,12 +46,12 @@ const Bookings = (props) => {
                         /> 
                     </Block>
                     <Block flex={6} center paddingTop={theme.sizes.body}>
-                        <Image source={{uri: booking.employee.profilePicture}} style={{width: 150, height: 150, borderRadius: 75}} />
-                        <Text style={{paddingVertical: theme.sizes.body}} bold>{booking.employee.name}</Text>
+                        <Image source={ booking.employee.profilePicture ? {uri: booking.employee.profilePicture } :require("../assets/images/person.png")} style={{width: 150, height: 150, borderRadius: 75}} />
                     </Block>
                     <Block flex={3} center>
+                        <Text style={{paddingVertical: theme.sizes.body}} bold>{booking.employee.name}</Text>
                         <Text><Text bold>Email: </Text>{booking.employee.email}</Text>
-                        <Text><Text bold>Phone: </Text>+{booking.employee.phone}</Text>
+                        <Text><Text bold>Phone: </Text>{booking.employee.phone}</Text>
                     </Block>
                 </Block>
             </Modal>    
@@ -155,7 +155,7 @@ const Bookings = (props) => {
                                     <Text style={{alignSelf: 'flex-start'}} size={12} gray>Beautician started service started at <Text bold>{(((new Date(booking.start_time).getHours() % 12) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getHours() % 12)) : (new Date(booking.start_time).getHours() % 12)) + 
                                     ":" + (((new Date(booking.start_time).getMinutes()) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getMinutes() )) : (new Date(booking.start_time).getMinutes() ))  + 
                                     "  " + getAMPM(new Date(booking.start_time).getHours())}</Text></Text>
-                                    <TouchableOpacity style={styles.startButton} onPress={() => props.endServiceTime(booking)}>
+                                    <TouchableOpacity style={styles.startButton} onPress={() => props.endServiceTime(booking, props.navigation)}>
                                         <Text style={{marginVertical: 3}} center white size={16}>End</Text>
                                     </TouchableOpacity>
                                 </Block>
@@ -163,7 +163,7 @@ const Bookings = (props) => {
                                 <Block center marginTop={theme.sizes.body}>
                                     
                                     <Text style={{alignSelf: 'flex-start'}} size={12} gray>When your beautician arrives press the start button</Text>
-                                    <TouchableOpacity style={styles.startButton} onPress={() => props.startServiceTime(booking) }>
+                                    <TouchableOpacity style={styles.startButton} disabled={booking.status === "Pending"} onPress={() => props.startServiceTime(booking) }>
                                         <Text style={{marginVertical: 3}} center white size={16}>Start</Text>
                                     </TouchableOpacity>
                                 </Block>
@@ -304,7 +304,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = (dispatch) => ({
     fetchBookings: () => fetchOrders(dispatch),
     startServiceTime: (booking) => startServiceTime(dispatch, booking),
-    endServiceTime: (booking) => endServiceTime(dispatch, booking)
+    endServiceTime: (booking, navigation) => endServiceTime(dispatch, booking, navigation)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(Bookings)
@@ -312,7 +312,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(Bookings)
 const styles = StyleSheet.create({
     header: {
       paddingTop: Platform.OS === 'ios' ? 25 : StatusBarManager.HEIGHT * 1.5,
-      paddingBottom: theme.sizes.base
+      paddingBottom: theme.sizes.base,
+      marginBottom: theme.sizes.base * 0.75
     },
    
     tabItem: {

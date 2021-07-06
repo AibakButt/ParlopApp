@@ -30,6 +30,8 @@ const { width, height } = Dimensions.get("window");
 function Home(props) {
  
   const [city, setCity] = useState("Lahore");
+  const [categoryLoading, setCategoryLoading] = useState(false);
+  const [dealsLoading, setDealsLoading] = useState(false);
 
   const handleCitySelect = (value) => {
 
@@ -43,10 +45,15 @@ function Home(props) {
   let scrollX = new Animated.Value(0);
 
   useEffect(() => {
+    setCategoryLoading(true)
+    setDealsLoading(true)
 
     props.fetchCategories();
     props.fetchServices();
+    setCategoryLoading(false)
+
     props.fetchDealImages();
+    setDealsLoading(false)
     
   }, []);
 
@@ -143,13 +150,15 @@ function Home(props) {
         <Block flex={0.5} padding={15} color={theme.colors.white}>
             <Text center size={20} accent bold>CATEGORIES</Text>
         </Block>
-        <Block flex={5} color={theme.colors.white} style={{marginBottom: theme.sizes.base *1.5}}>
+        <Block flex={5} color={theme.colors.white} style={{marginBottom: theme.sizes.base * 1.5}}>
         <ScrollView
           showsVerticalScrollIndicator={false}
           style={{ marginBottom: theme.sizes.base * 1.5,  paddingVertical: theme.sizes.base * 0.5,  }}
         >
           <Block row space="between" style={styles.categories}>
-            {categories.map(category => (
+            {console.log(props.services)}
+            {categoryLoading ? <ActivityIndicator size="small" color={theme.colors.accent} /> : <></>}
+            {categories && categories.map(category => (
               <TouchableOpacity
                 key={category._id}
                 onPress={() => navigation.navigate("Services",  category )}
@@ -171,7 +180,7 @@ function Home(props) {
                   </Text>
                   <Text gray caption>
                     {
-                      props.services.filter(ser => ser.category._id == category._id).length
+                     props.services.filter(ser => ser.category._id == category._id).length
                     }
                     {" "}services
                   </Text>
@@ -204,7 +213,7 @@ const styles = StyleSheet.create({
   header: {
     paddingHorizontal: theme.sizes.base ,
     paddingTop: Platform.OS === 'ios' ? 25 : StatusBarManager.HEIGHT * 1.5,
-    paddingBottom: theme.sizes.base
+    paddingBottom: theme.sizes.base 
   },
   avatar: {
     height: theme.sizes.base * 2.2,

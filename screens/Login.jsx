@@ -6,10 +6,10 @@ import Icon from '../components/Icon';
 import { connect } from "react-redux";
 import {  
   handleTextChange, 
-  resendCode,
-  sendPhoneNoLogin,
-  sendVerificationCodeAndLogin,
+  checkPhoneNoExists,
+  login,
 } from './../redux/actions/authentication';
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 import { theme } from '../constants';
 import { Block, Text} from '../components';
@@ -135,26 +135,40 @@ class Register extends Component {
   }
 
   sendPhoneNo = async () => {
+
+    if((this.props.auth.phone).length !== 10 || this.props.auth.phone.charAt(0) != '3'){
+      showMessage({
+        message: "Phone number is not valid",
+        type: "danger",
+        floating: true
+      });
+      this.props.handleTextChange("", 'phone')
+      return
+    } 
+
     try {
       this.setState({showLoading: true})
-      await this.props.sendPhoneNoLogin()
+      await this.props.checkPhoneNoExists()
       this.setState({showLoading: false, codeFeildShow: true})
     } catch (error) {
       this.setState({showLoading: false})
       console.log(error)
     }
-    
+   
 
   }
 
-  sendVerificationCode = async () => {
+  login = async () => {
 
     try {
       this.setState({showLoading: true})
-      await this.props.sendVerificationCodeAndLogin()
+      await this.props.login()
       this.setState({showLoading: false, nameShow: true})
       console.log(this.props.route.params)
-      this.props.navigation.dangerouslyGetParent().navigate("HomeTabs")
+      this.props.navigation.dangerouslyGetParent().replace("HomeTabs")
+      //Reset Field
+      this.props.handleTextChange("", 'phone')
+      this.props.handleTextChange("", 'password')
 
     } catch (error) {
       console.log(error)
@@ -177,8 +191,8 @@ class Register extends Component {
             <TextInput
                 style={[styles.phoneInput, {width: '80%', height: 50, color: 'black', letterSpacing: 4, borderTopRightRadius: 12,borderBottomRightRadius: 12,}]}
                 onChangeText={(e) => this.props.handleTextChange(e, 'phone')}
-                placeholder="Phone Number"
-                value={this.props.auth.phoneNumber}
+                placeholder="3XX XXXXXXX"
+                value={this.props.auth.phone}
                 keyboardType='numeric'
                 maxLength={10}
             />
@@ -190,7 +204,7 @@ class Register extends Component {
                     <ActivityIndicator size="small" color={theme.colors.white} />
                     ) : (
                     <Text bold white>
-                        Send Code
+                        Next
                     </Text>
                   )
                 }  
@@ -205,24 +219,24 @@ class Register extends Component {
 )
   }
 
-  renderCodeInput = () => {
+  renderPasswordInput = () => {
     return (
       <Block>
         <TextInput
             keyboardType='numeric'
             maxLength={4}
-            placeholder="Code"
-            value={this.props.auth.code}
-            onChangeText={(e) => {this.props.handleTextChange(e,'code')}}
+            placeholder="Password"
+            value={this.props.auth.password}
+            onChangeText={(e) => {this.props.handleTextChange(e,'password')}}
             style={styles.textInput}
         />
-        <TouchableOpacity style={styles.next} onPress={() => this.sendVerificationCode()}>
+        <TouchableOpacity style={styles.next} onPress={() => this.login()}>
                 {
                   this.state.showLoading ? (
                     <ActivityIndicator size="small" color={theme.colors.white} />
                     ) : (
                     <Text bold white>
-                        Verify
+                        Login
                     </Text>
                   )
                 }
@@ -232,9 +246,10 @@ class Register extends Component {
             <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
                 <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => this.props.resendCode(this.props.auth)}>
-                <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Resend Code</Text>
+            <TouchableOpacity onPress={() => this.props.navigation.navigate("Forgot")}>
+              <Text gray size={12} style={{textDecorationLine: 'underline'}}>Forgot Password</Text>
             </TouchableOpacity>
+    
         </Block>
     </Block>
     )
@@ -296,7 +311,7 @@ class Register extends Component {
             
             {
                 this.state.codeFeildShow ? (
-                    this.renderCodeInput()
+                    this.renderPasswordInput()
                     ) : (
                     this.renderPhoneInput()
                     )
@@ -320,9 +335,8 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
   handleTextChange: (value, field) => handleTextChange(dispatch, value, field),
-  sendPhoneNoLogin: () => sendPhoneNoLogin(dispatch),
-  sendVerificationCodeAndLogin: () => sendVerificationCodeAndLogin(dispatch),
-  resendCode: () => resendCode(dispatch),
+  checkPhoneNoExists: () => checkPhoneNoExists(dispatch),
+  login: () => login(dispatch),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Register);

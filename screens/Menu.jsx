@@ -7,6 +7,8 @@ import { Platform } from 'react-native';
 import Icon from '../components/Icon';
 import { getCurrentCustomer } from '../redux/actions/authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Badge from './../components/Badge';
+import { fetchCoupons } from './../redux/actions/couponActions';
 
 const { StatusBarManager } = NativeModules;
 
@@ -26,7 +28,7 @@ const Menu = (props) => {
         }
         
         getCustomer()
-
+        props.coupons.length === 0 && props.fetchCoupons()
         
     }, []);
 
@@ -35,6 +37,7 @@ const Menu = (props) => {
             console.log("Trying to remove first time...")
             await AsyncStorage.removeItem(key);
             console.log("Token Removed")
+            props.navigation.replace("HomeTabs")
             return true;
         }
         catch(exception) {
@@ -44,8 +47,8 @@ const Menu = (props) => {
     }
 
     return (
-        <Block flex={1} style={styles.header}>
-                <Block row flex={1.5} color={theme.colors.white} style={{borderRadius:12}} margin={[0,10,0,10]} center middle>
+        <Block flex={1} style={styles.header} >
+                <Block  row flex={1.5} color={theme.colors.white} style={{borderRadius:12}} margin={[0,10,0,10]} center middle>
                     <Block style={{paddingHorizontal: 12}} flex={2}>
                         <Image source={require('../assets/images/user.png')} style={styles.logo}/>
                     </Block>
@@ -64,7 +67,7 @@ const Menu = (props) => {
                         }
                     </Block>
                 </Block>
-                <Block flex={8} color="white" style={{borderRadius:12}} margin={[5,10,0,10]} > 
+                <Block flex={8} color="white" style={{borderRadius:12}} margin={[5,10,25,10]} > 
                     <ScrollView
                         showsVerticalScrollIndicator={false}
                         contentInset={{top: 0, left: 0, bottom: 0, right: 0}}
@@ -90,6 +93,7 @@ const Menu = (props) => {
                                 size={22}
                                 color={theme.colors.accent}
                             />
+                            <Text style={{fontSize:14, position: 'absolute', bottom: 15, left: -10, backgroundColor: theme.colors.accent, paddingHorizontal: theme.sizes.base * 0.25, borderRadius: 12 }} white>{props.coupons.filter(c => new Date(c.validity) > new Date()).length}</Text>
                             <Text style={{paddingLeft: 12}} size={18}>Coupons</Text>
                             </Block>
                        </TouchableOpacity>
@@ -129,7 +133,7 @@ const Menu = (props) => {
                        <TouchableOpacity style={styles.menuItem} onPress={() => removeItemValue("customer") }>
                             <Block row>
                                 <Icon
-                                    name={'phone'}
+                                    name={'logout'}
                                     type={'materialCommunity'}
                                     size={22}
                                     color={theme.colors.accent}
@@ -146,12 +150,12 @@ const Menu = (props) => {
 }
 
 const mapStateToProps = (state) => ({
-    
+    coupons: state.couponReducer.coupons
 })
 
-const mapDispatchToProps = {
-    
-}
+const mapDispatchToProps = (dispatch) => ({
+    fetchCoupons: () => fetchCoupons(dispatch)
+})
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu)
 

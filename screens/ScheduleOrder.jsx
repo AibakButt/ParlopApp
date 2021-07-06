@@ -66,12 +66,12 @@ function ScheduleOrder(props) {
     }
 
     const onChangeTime = (selectedTime) => {
+        setShowTimePicker(false);
 
         //when cancel button press
         if(!selectedTime) return 
 
         const currentTime = selectedTime || time;
-        setShowTimePicker(false);
         let now  = new Date()
         let sameDay = date.getDay() === now.getDay()
 
@@ -161,7 +161,7 @@ function ScheduleOrder(props) {
     
     return (
 
-       <Block color={theme.colors.gray2}>
+       <Block color={theme.colors.gray2} style={{marginBottom: theme.sizes.base * 1.65}}>
             <Block flex={0.9}>
                 <ScrollView>
                     <Block flex={false}>
@@ -238,7 +238,7 @@ function ScheduleOrder(props) {
                                 style={[styles.phoneInput, {width: '80%', color: 'black', letterSpacing: 4, borderTopRightRadius: 12,borderBottomRightRadius: 12,}]}
                                 onChangeText={(value) => props.handleTextChange("phone",value)}
                                 placeholder="Phone Number"
-                                value={customer && customer.phone? customer.phone.substr(2,customer.phone.length-1): order.phone}
+                                value={customer && customer.phone? customer.phone.substr(3,customer.phone.length-1): order.phone}
                                 keyboardType="numeric"
                                 maxLength={10}
                             />
