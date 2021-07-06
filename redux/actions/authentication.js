@@ -10,7 +10,7 @@ export const sendPhoneNo = async (dispatch) => {
   try {
     let auths = {...store.getState().authReducer.auth};
 
-    const { data } = await axios.post(apiEndPoint + "/sign-up", {phoneNumber: "92"+auths.phone});
+    const { data } = await axios.post(apiEndPoint + "/sign-up", {phoneNumber: "+92"+auths.phone});
     console.log(data)
    
     dispatch({
@@ -41,7 +41,7 @@ export const sendVerificationCode = async (dispatch) => {
 
       let auths = {...store.getState().authReducer.auth};
       console.log(auths)
-      const { data } = await axios.post(apiEndPoint + "/verify-code" , {request_id: auths.request_id, code: auths.code});
+      await axios.post(apiEndPoint + "/verify-code" , {phoneNumber: "+92"+auths.phone, code: auths.code});
 
       dispatch({
         type: ActionTypes.VERIFY_CODE,
@@ -49,7 +49,7 @@ export const sendVerificationCode = async (dispatch) => {
       });
 
     } catch (error) {
-      console.log(error);
+      console.log(error.message);
       showMessage({
         message: "You entered invalid code",
         type: "danger",
@@ -62,12 +62,19 @@ export const sendVerificationCode = async (dispatch) => {
 export const resendCode = async (dispatch ) => {
     try {
       let auths = {...store.getState().authReducer.auth};
-      const { data } = await axios.post(apiEndPoint + "/re-send-code" , {request_id: auths.request_id, phoneNumber: auths.phone});
+      const { data } = await axios.post(apiEndPoint + "/re-send-code" , {phoneNumber: "+92"+auths.phone});
 
       dispatch({
         type: ActionTypes.RESEND_CODE,
         payload: auths,
       });
+
+      showMessage({
+        message: "Code has been resent",
+        type: "success",
+        floating: true
+      });
+
     } catch (error) {
       console.log(error);
     }
@@ -77,7 +84,7 @@ export const registerCustomer = async (dispatch) => {
   try {
     let auths = {...store.getState().authReducer.auth};
     
-    const { data } = await axios.post(apiEndPoint + "/" , {phoneNumber: "92"+auths.phone, nameCustomer: auths.name});
+    const { data } = await axios.post(apiEndPoint + "/" , {phoneNumber: "+92"+auths.phone, nameCustomer: auths.name, password: auths.password});
 
 
     
@@ -119,26 +126,20 @@ export const handleTextChange = (dispatch, value, field) => {
     });
 };
 
-export const sendPhoneNoLogin = async (dispatch) => {
+export const checkPhoneNoExists = async (dispatch) => {
   try {
     let auths = {...store.getState().authReducer.auth};
 
-    const { data } = await axios.post(apiEndPoint + "/sign-in", {phoneNumber: "92"+auths.phone});
-    console.log(data)
+    const { data } = await axios.post(apiEndPoint + "/phoneNoExists", {phoneNumber: "+92" + auths.phone});
+    // console.log(data)
    
     dispatch({
       type: ActionTypes.SEND_PHONE_NO,
       payload: {...auths, request_id: data.request_id},
     });
-
-    showMessage({
-      message: "Verification code has been sent to your phone number",
-      type: "success",
-      floating: true
-    });
     
   } catch (error) {
-    console.log(error);
+    
     showMessage({
       message: error.response.data.message,
       type: "danger",
@@ -148,11 +149,11 @@ export const sendPhoneNoLogin = async (dispatch) => {
   }
 };
 
-export const sendVerificationCodeAndLogin = async (dispatch) => {
+export const login = async (dispatch) => {
     try {
 
       let auths = {...store.getState().authReducer.auth};
-      const { data } = await axios.post(apiEndPoint + "/verify-code" , {request_id: auths.request_id, code: auths.code, phoneNumber: "92"+auths.phone });
+      const { data } = await axios.post(apiEndPoint + "/sign-in" , { password: auths.password, phoneNumber: "+92"+auths.phone });
       console.log(data.token)
       try {
         await AsyncStorage.setItem("customer", JSON.stringify(data.token));
@@ -167,13 +168,43 @@ export const sendVerificationCodeAndLogin = async (dispatch) => {
     } catch (error) {
       console.log(error);
       showMessage({
-        message: "You entered invalid code",
+        message: "Your password is incorrect",
         type: "danger",
         floating: true
       });
       throw new Error()
     }
 };
+
+
+export const createNewPassword = async (dispatch) => {
+  try {
+    let auths = {...store.getState().authReducer.auth};
+
+    const { data } = await axios.post(apiEndPoint + "/createNewPassword", {phoneNumber: "+92" + auths.phone, password: auths.password});
+    console.log(data.token)
+      try {
+        await AsyncStorage.setItem("customer", JSON.stringify(data.token));
+      } catch (error) {
+        console.log("Error in saving customer token", error)
+      }  
+   
+      dispatch({
+        type: ActionTypes.REGISTER_CUSTOMER,
+        payload: auths,
+      });
+    
+  } catch (error) {
+    
+    showMessage({
+      message: error.response.data.message,
+      type: "danger",
+      floating: true
+    });
+    throw new Error()
+  }
+};
+
 
 export function logout() {
   console.log("logging out...");

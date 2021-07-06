@@ -84,11 +84,12 @@ const Cart = (props) => {
                                     <Block row >
                                         <Block flex={6} >
                                             <Block padding={theme.sizes.base} space="around">
-                                                <Block color="accent" center middle style={{ alignSelf: 'flex-start',borderRadius: 12, paddingHorizontal:10, paddingVertical: 1}}><Text center white>{service.category.name}</Text></Block>
+                                                <Block color="accent" center middle style={{ alignSelf: 'flex-start',borderRadius: 12, paddingHorizontal:10, paddingVertical: 1}}><Text center white>{service.category &&service.category.name}</Text></Block>
                                                 <Block padding={5}><Text>{service && service.name?service.name:''}</Text></Block>
                                                 <Block paddingHorizontal={5}><Text accent h2>Rs. {service.price}</Text></Block>
                                             </Block>
                                         </Block>
+                                        
                                         <Block flex={4} row center middle>
                                         <TouchableOpacity style={[styles.actionButton, {borderTopLeftRadius: 12, borderBottomLeftRadius: 12}]} onPress={() => {props.decreaseService(sindex)}}>
                                             <Icon
@@ -156,7 +157,7 @@ const Cart = (props) => {
                     </ScrollView>
                
                 </Block>
-                <Block flex={1} style={{marginBottom: theme.sizes.base* 1.4, marginHorizontal: 10}} >
+                <Block flex={1} style={{marginBottom: theme.sizes.base* 1.5, marginHorizontal: 10}} >
                     <Button onPress={() => checkLogin() } color={theme.colors.accent} style={{borderRadius: 12}}><Text center white bold>Schedule your order</Text></Button>
                 </Block>
             </Block>

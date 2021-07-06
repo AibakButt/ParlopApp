@@ -2,15 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Block, Text} from '../components'
 import { theme } from '../constants'
-import { StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import { StyleSheet, TouchableOpacity, ScrollView, TextInput, KeyboardAvoidingView } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
-import { handleTextChange } from './../redux/actions/contactUsActions';
+import { handleTextChange, submitContactUs } from './../redux/actions/contactUsActions';
 
 function ContactUs (props) {
    
     const { contactUs } = props
 
     return (
+        <KeyboardAvoidingView flex={1} behavior="padding">
         <Block color={theme.colors.gray2}>
             <Block flex={0.9}>
                 <ScrollView>
@@ -74,7 +75,7 @@ function ContactUs (props) {
                 </ScrollView>
             </Block>
             <Block flex={0.1} >
-                <TouchableOpacity style={styles.submitButton} >
+                <TouchableOpacity style={styles.submitButton} onPress={() => props.submitContactUs()} >
                    
                         <Text white size={16} bold center> 
                            Submit
@@ -83,6 +84,7 @@ function ContactUs (props) {
                 </TouchableOpacity>
             </Block>
        </Block>
+       </KeyboardAvoidingView>
     )
 }
 
@@ -92,7 +94,8 @@ const mapStateToProps = (state) => ({
 
 
 const mapDispatchToProps = (dispatch) => ({
-    handleTextChange: (field, value) => handleTextChange(dispatch, field, value)
+    handleTextChange: (field, value) => handleTextChange(dispatch, field, value),
+    submitContactUs: () => submitContactUs(dispatch)
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(ContactUs)
@@ -130,6 +133,6 @@ const styles = StyleSheet.create({
         padding: theme.sizes.base,
         borderRadius: 12,
         backgroundColor: theme.colors.accent,
- 
+        paddingVertical: theme.sizes.base
     }
 })

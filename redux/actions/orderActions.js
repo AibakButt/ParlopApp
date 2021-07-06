@@ -1,7 +1,9 @@
 import store from "../index";
 import * as ActionTypes from "../types/orderTypes";
+import * as ActionTypes2 from "../types/cartTypes";
 import axios from 'axios';
 import { getCurrentCustomer } from "./authentication";
+import { showMessage, hideMessage } from "react-native-flash-message";
 
 const apiEndPoint = "https://parlor-server.herokuapp.com/api/order";
 const apiEndPoint2 = "https://parlor-server.herokuapp.com/api/travelCharges";
@@ -66,13 +68,14 @@ export const handleTextChange = async (dispatch, field ,value) => {
 export const submitOrder = async (dispatch) => {
   try {
     let order = {...store.getState().orderReducer.order};
+    let cartServices = {...store.getState().cartReducer.cartServices,};
     order.service.forEach(ser => {
       ser.category = ser.category._id
      } )
 
     order.customerId = (await getCurrentCustomer()).id
-    const { data } = await axios.post(apiEndPoint,order)
     console.log("Your order is submitted...:",order)
+    const { data } = await axios.post(apiEndPoint,order)
 
      //Reset order data
       order.date= new Date()
@@ -89,14 +92,30 @@ export const submitOrder = async (dispatch) => {
       order.end_time= ""
       order.specialInstructions= ""
       order.travelCharges= 0
+
+      //reset Cart
+      cartServices = []
+
+      dispatch({
+        type: ActionTypes2.REMOVE_ALL_TO_CART,
+        payload: {cartServices},
+      });
      
       dispatch({
         type: ActionTypes.UPDATE_ORDER,
         payload: order,
       });
 
+      
+
   } catch (error) {
     console.log(error)
+    showMessage({
+      message: "Order cannot be placed. Try again in a few minutes",
+      type: "danger",
+      floating: true
+    });
+    throw error
   }
 }
 
@@ -120,7 +139,7 @@ export const startServiceTime = async (dispatch, order) => {
   }
 }
 
-export const endServiceTime = async (dispatch, order) => {
+export const endServiceTime = async (dispatch, order, navigation) => {
   try {
     const {data} = await axios.put(apiEndPoint+"/"+order._id, {end_time: new Date()})
     console.log(data)
@@ -128,7 +147,8 @@ export const endServiceTime = async (dispatch, order) => {
     let index = orders.findIndex(a => a._id === order._id);
     orders[index].end_time = new Date();
     orders[index].status = "Completed";
-    console.log("Order Completed",orders[index])
+
+    navigation.push("OrderCompleted")
 
     dispatch({
       type: ActionTypes.END_TIME,

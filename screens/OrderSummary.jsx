@@ -1,29 +1,13 @@
 import React, {useRef} from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from '../components'
-import { ScrollView, Image, StyleSheet } from 'react-native';
+import { ScrollView, Image, StyleSheet,TouchableOpacity } from 'react-native';
 import { theme } from '../constants';
 import { useEffect } from 'react';
 import { addServicesFromCart, submitOrder } from './../redux/actions/orderActions';
-import { services } from '../constants/mocks';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { TextInput } from 'react-native';
 import { applyCoupon, handleTextChange } from '../redux/actions/couponActions';
-
-const coupons = [{
-    code: "CINM213",
-    description: "350 off on youe next order",
-    discountPercertage: "12",
-    discountPrice: "500",
-    validity: new Date()
-},{
-    code: "CINM213",
-    description: "350 off on youe next order",
-    discountPercertage: "12",
-    discountPrice: "500",
-    validity: new Date()
-}]
 
 
 
@@ -39,14 +23,17 @@ function OrderSummary (props) {
       
     const getAMPM = (hours) => {
         
-        let ampm = hours >= 12 ? 'PM' : 'AM';
-        return ampm;
+        return hours >= 12 ? 'PM' : 'AM';
     }
 
     const submitOrder = async () => {
 
-        await props.submitOrder()
-        props.navigation.navigate("OrderPlaced")
+        try {
+            await props.submitOrder()
+            props.navigation.navigate("OrderPlaced")
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const refRBSheet = useRef();
@@ -140,7 +127,7 @@ function OrderSummary (props) {
                                 </Block>
                             {
                                 service.addons.length > 0 && (
-                                    service.addons.map(addon => (
+                                    service.addons.map((addon,index) => (
                                         <Block row space="around" paddingLeft={theme.sizes.base * 2.5}>
                                             <Block flex={0.4} padding={[theme.sizes.body*0.5,theme.sizes.body,theme.sizes.body*0.5,theme.sizes.body]}>
                                                 <Text size={16} gray>x{addon.quantity}</Text>

@@ -21,10 +21,11 @@ export const fetchCoupons = async (dispatch) => {
 
 export const applyCoupon = async (dispatch) => {
   try {
+    console.log("Applying Coupon")
     const { data } = await axios.get(apiEndPoint+"/"+ (await getCurrentCustomer()).id);
     let coupon = {...store.getState().couponReducer.coupon};
     
-    let couponFound = data.customer.coupons.filter(c => (c.code+'' == coupon.code+'')?true:false)
+    let couponFound = data.customer.coupons.filter(c => (c.code.toUpperCase().trim() == coupon.code.toUpperCase().trim())?true:false)
     if(couponFound.length===0){
       showMessage({
         message: "Coupon Not Found",
@@ -35,7 +36,7 @@ export const applyCoupon = async (dispatch) => {
     }
 
     
-    // console.log("Coupon Found",couponFound, coupon.code)
+    console.log("Coupon Found",couponFound, coupon.code)
 
 
     let order = {...store.getState().orderReducer.order};
