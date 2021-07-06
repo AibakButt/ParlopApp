@@ -35,7 +35,15 @@ export const applyCoupon = async (dispatch) => {
       return;
     }
 
-    
+    if(new Date(couponFound[0].validity) < new Date()) {
+      showMessage({
+        message: "Coupon Expired",
+        type: "danger",
+        floating: true
+      });
+      return;
+    }
+     
     console.log("Coupon Found",couponFound, coupon.code)
 
 

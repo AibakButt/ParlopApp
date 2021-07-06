@@ -68,7 +68,7 @@ class Forgot extends Component {
     super();
 
     this.state = {
-        codeFeildShow: false,
+        showTextInput: 'phone',
         showLoading: false
     }
 
@@ -151,7 +151,7 @@ class Forgot extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.sendPhoneNo()
-      this.setState({showLoading: false, codeFeildShow: true})
+      this.setState({showLoading: false, showTextInput: 'code'})
     } catch (error) {
       this.setState({showLoading: false})
       console.log(error)
@@ -164,7 +164,7 @@ class Forgot extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.sendVerificationCode()
-      this.setState({showLoading: false, nameShow: 'password'})
+      this.setState({showLoading: false, showTextInput: 'password'})
     } catch (error) {
       this.setState({showLoading: false})
     }
@@ -175,7 +175,7 @@ class Forgot extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.createNewPassword()
-      this.setState({showLoading: false, nameShow: true})
+      this.setState({showLoading: false })
       console.log(this.props.route.params)
       this.props.navigation.dangerouslyGetParent().replace("HomeTabs")
       //Reset Field
@@ -271,9 +271,8 @@ class Forgot extends Component {
     return (
       <Block>
         <TextInput
-            keyboardType='numeric'
-            maxLength={4}
-            placeholder="Password"
+           
+            placeholder="New Password"
             value={this.props.auth.password}
             onChangeText={(e) => {this.props.handleTextChange(e,'password')}}
             style={styles.textInput}
@@ -284,7 +283,7 @@ class Forgot extends Component {
                     <ActivityIndicator size="small" color={theme.colors.white} />
                     ) : (
                     <Text bold white>
-                        createNewPassword
+                        Save and Login
                     </Text>
                   )
                 }
@@ -317,7 +316,7 @@ class Forgot extends Component {
           }}
         >
           <Image
-            source={require('../assets/images/Forgot-bg.jpg')}
+            source={require('../assets/images/register-bg.jpg')}
             style={{ flex: 1, height: null, width: null }}
           />
         </Animated.View>
@@ -330,7 +329,7 @@ class Forgot extends Component {
                 transform: [{ translateY: this.buttonY }]
               }}
             >
-              <Text white bold >createNewPassword</Text>
+              <Text white bold >Recover Password</Text>
             </Animated.View>
           </TapGestureHandler>
           

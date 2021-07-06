@@ -61,12 +61,12 @@ function runTiming(clock, value, dest) {
     state.position
   ]);
 }
-class Register extends Component {
+class Login extends Component {
   constructor() {
     super();
 
     this.state = {
-        codeFeildShow: false,
+        showTextInput: 'phone',
         showLoading: false
     }
 
@@ -149,7 +149,7 @@ class Register extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.checkPhoneNoExists()
-      this.setState({showLoading: false, codeFeildShow: true})
+      this.setState({showLoading: false, showTextInput: 'password'})
     } catch (error) {
       this.setState({showLoading: false})
       console.log(error)
@@ -223,8 +223,6 @@ class Register extends Component {
     return (
       <Block>
         <TextInput
-            keyboardType='numeric'
-            maxLength={4}
             placeholder="Password"
             value={this.props.auth.password}
             onChangeText={(e) => {this.props.handleTextChange(e,'password')}}
@@ -310,11 +308,10 @@ class Register extends Component {
                     </TapGestureHandler>
             
             {
-                this.state.codeFeildShow ? (
-                    this.renderPasswordInput()
-                    ) : (
-                    this.renderPhoneInput()
-                    )
+              this.state.showTextInput === 'phone' && this.renderPhoneInput()            
+            }
+            {
+              this.state.showTextInput === 'password' && this.renderPasswordInput()            
             }
             
             
@@ -339,7 +336,7 @@ const mapDispatchToProps = (dispatch) => ({
   login: () => login(dispatch),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Register);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
 
 const styles = StyleSheet.create({
   container: {

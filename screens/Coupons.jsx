@@ -66,7 +66,15 @@ function Coupons (props) {
                             </Block>
                             <Block row space="between" paddingTop={theme.sizes.base*0.75}>
                                 <Text bold center>Rs.{coupon.validMinimum} <Text gray>minimum</Text></Text>
-                                <Text gray center>Valid until: <Text bold black>{new Date(coupon.validity).toDateString()}</Text></Text>
+                                <Text gray center>Valid until: 
+                                    {
+                                        new Date(coupon.validity) > new Date() ?  (
+                                            <Text bold black>{new Date(coupon.validity).toDateString()}</Text>
+                                        ) : (
+                                            <Text accent> Expired</Text>
+                                        )
+                                    }
+                                </Text>
                             </Block>
                         </Block>
                     ))

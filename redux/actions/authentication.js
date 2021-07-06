@@ -130,7 +130,7 @@ export const checkPhoneNoExists = async (dispatch) => {
   try {
     let auths = {...store.getState().authReducer.auth};
 
-    const { data } = await axios.post(apiEndPoint + "/phoneNoExists", {phoneNumber: "+92" + auths.phone});
+    const { data } = await axios.post(apiEndPoint + "/phone-no-exists", {phoneNumber: "+92" + auths.phone});
     // console.log(data)
    
     dispatch({
@@ -181,7 +181,7 @@ export const createNewPassword = async (dispatch) => {
   try {
     let auths = {...store.getState().authReducer.auth};
 
-    const { data } = await axios.post(apiEndPoint + "/createNewPassword", {phoneNumber: "+92" + auths.phone, password: auths.password});
+    const { data } = await axios.post(apiEndPoint + "/create-new-password", {phoneNumber: "+92" + auths.phone, password: auths.password});
     console.log(data.token)
       try {
         await AsyncStorage.setItem("customer", JSON.stringify(data.token));
