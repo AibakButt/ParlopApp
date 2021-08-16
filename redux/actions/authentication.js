@@ -179,7 +179,7 @@ export const createNewPassword = async (dispatch) => {
   try {
     let auths = {...store.getState().authReducer.auth};
 
-    const { data } = await axios.post(apiEndPoint + "/createNewPassword", {phoneNumber: "+92" + auths.phone, password: auths.password});
+    const { data } = await axios.post(apiEndPoint + "/create-new-password", {phoneNumber: "+92" + auths.phone, password: auths.password});
     console.log(data.token)
       try {
         await AsyncStorage.setItem("customer", JSON.stringify(data.token));

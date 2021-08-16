@@ -146,7 +146,7 @@ class Forgot extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.sendVerificationCode()
-      this.setState({showLoading: false, nameShow: 'password'})
+      this.setState({showLoading: false, showTextInput: 'password'})
     } catch (error) {
       this.setState({showLoading: false})
     }
@@ -157,7 +157,7 @@ class Forgot extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.createNewPassword()
-      this.setState({showLoading: false, nameShow: true})
+      this.setState({showLoading: false })
       console.log(this.props.route.params)
       this.props.navigation.dangerouslyGetParent().replace("HomeTabs")
       //Reset Field
@@ -253,9 +253,8 @@ class Forgot extends Component {
     return (
       <Block>
         <TextInput
-            keyboardType='numeric'
-            maxLength={4}
-            placeholder="Password"
+           
+            placeholder="New Password"
             value={this.props.auth.password}
             onChangeText={(e) => {this.props.handleTextChange(e,'password')}}
             style={styles.textInput}
@@ -267,6 +266,7 @@ class Forgot extends Component {
                     ) : (
                     <Text bold white>
                         Create New Password
+
                     </Text>
                   )
                 }
@@ -313,8 +313,9 @@ class Forgot extends Component {
               }}
             >
               <TouchableOpacity onPress={ () => sendVerificationCode}>
-                <Text white bold>Send Verification Code</Text>
+                <Text white bold >Recover Password</Text>
               </TouchableOpacity>
+
             </Animated.View>
           </TapGestureHandler>
           

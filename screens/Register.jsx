@@ -184,6 +184,7 @@ class Register extends Component {
       this.props.handleTextChange("", 'phone')
       this.props.handleTextChange("", 'code')
       this.props.handleTextChange("", 'name')
+      this.props.handleTextChange("", 'password')
     } catch (error) {
       this.setState({showLoading: false})
     }
@@ -243,18 +244,17 @@ class Register extends Component {
             maxLength={4}
         />
         <TouchableOpacity style={styles.next} onPress={() => this.sendVerificationCode()}>
-                {
-                  this.state.showLoading ? (
-                    <ActivityIndicator size="small" color={theme.colors.white} />
-                    ) : (
-                    <Text bold white>
-                        Verify
-                    </Text>
-                  )
-                }
+          {
+            this.state.showLoading ? (
+              <ActivityIndicator size="small" color={theme.colors.white} />
+              ) : (
+              <Text bold white>
+                  Verify
+              </Text>
+            )
+          }
         </TouchableOpacity>
         <Block row space="around">
-            
             <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
                 <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
             </TouchableOpacity>

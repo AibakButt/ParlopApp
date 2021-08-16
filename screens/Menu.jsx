@@ -94,6 +94,7 @@ const Menu = (props) => {
                                 color={theme.colors.accent}
                             />
                             {props.coupons.length !== 0 && <Text style={{fontSize:14, position: 'absolute', bottom: 15, left: -10, backgroundColor: theme.colors.accent, paddingHorizontal: theme.sizes.base * 0.25, borderRadius: 12 }} white>{props.coupons.filter(c => new Date(c.validity) > new Date()).length}</Text>}
+
                             <Text style={{paddingLeft: 12}} size={18}>Coupons</Text>
                             </Block>
                        </TouchableOpacity>

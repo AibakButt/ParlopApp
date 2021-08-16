@@ -56,7 +56,6 @@ export const applyCoupon = async (dispatch) => {
       });
       return;
     }
-  
 
 
     let order = {...store.getState().orderReducer.order};
