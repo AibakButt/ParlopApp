@@ -19,7 +19,7 @@ export const authReducer = (state = initialState, action) => {
       return { ...state, auth: action.payload };
     case ActionTypes.REGISTER_CUSTOMER:
       return { ...state, auth: action.payload };
-    case ActionTypes.HANDLE_TEXT_CHANGE:
+    case ActionTypes.HANDLE_TEXT_CHANGE_AUTH:
       return { ...state, auth: action.payload };
     default:
       return state;

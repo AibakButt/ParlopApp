@@ -223,9 +223,8 @@ class Register extends Component {
     return (
       <Block>
         <TextInput
-            keyboardType='numeric'
-            maxLength={4}
             placeholder="Password"
+            secureTextEntry={true}
             value={this.props.auth.password}
             onChangeText={(e) => {this.props.handleTextChange(e,'password')}}
             style={styles.textInput}

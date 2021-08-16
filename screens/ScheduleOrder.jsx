@@ -52,7 +52,7 @@ function ScheduleOrder(props) {
         if(!selectedDate) return 
 
         let now  = new Date()
-        if(selectedDate.getDay() < now.getDay()){
+        if(selectedDate.getTime() < now.getTime()){
             showMessage({
                 message: "Date can only be selected onwards from today",
                 type: "danger",
@@ -66,6 +66,11 @@ function ScheduleOrder(props) {
     }
 
     const onChangeTime = (selectedTime) => {
+
+        let startTime = 9
+        let endTime = 21
+        let diff = 4
+
         setShowTimePicker(false);
 
         //when cancel button press
@@ -73,31 +78,32 @@ function ScheduleOrder(props) {
 
         const currentTime = selectedTime || time;
         let now  = new Date()
-        let sameDay = date.getDay() === now.getDay()
+        let sameDay = date.getTime() === now.getTime()
 
         if(sameDay){
             //selected time on a same day should greater than now...
             if(selectedTime.getHours() < new Date().getHours()){
                 showMessage({
-                    message: "On a same day time, selected time should be greater than now",
+                    message: "Selected time should be 4 hours greater than now",
                     type: "danger",
                     floating: true
                   });
             }
-            if(selectedTime.getHours() >= 4 && selectedTime.getHours() <= 16 ){
+            // if(selectedTime.getHours() < )
+            if(selectedTime.getHours() + diff  >= startTime && selectedTime.getHours() + diff <= endTime ){
                 setTime(currentTime);
                 props.handleTextChange(selectedTime,"time")
             }
             else{
                 showMessage({
-                    message: "On a same day time can only be selected from 4:59 AM to 4:59 PM",
+                    message: "On a same day order time should be 4 hours after than now  be selected from 4:59 AM to 4:59 PM",
                     type: "danger",
                     floating: true
                   });
             }
         }
         else{
-            if(selectedTime.getHours() >= 8 && selectedTime.getHours() <= 20 ){
+            if(selectedTime.getHours() >= startTime && selectedTime.getHours() <= endTime ){
                 setTime(currentTime);
                 props.handleTextChange(selectedTime,"time")
             }
@@ -154,7 +160,7 @@ function ScheduleOrder(props) {
             return
         }
         
-        props.navigation.push("OrderSummary")
+        props.navigation.push("Order Summary")
     } 
 
     const {order} = props;
@@ -164,6 +170,7 @@ function ScheduleOrder(props) {
        <Block color={theme.colors.gray2} style={{marginBottom: theme.sizes.base * 1.65}}>
             <Block flex={0.9}>
                 <ScrollView>
+                    {/* {console.log("------------------Order--------------------",order)} */}
                     <Block flex={false}>
                         <Text style={styles.text}>Select Date</Text>
                         <TouchableOpacity  onPress={()=>setShowDatePicker(true)} >

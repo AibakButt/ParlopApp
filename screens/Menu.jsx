@@ -93,7 +93,7 @@ const Menu = (props) => {
                                 size={22}
                                 color={theme.colors.accent}
                             />
-                            <Text style={{fontSize:14, position: 'absolute', bottom: 15, left: -10, backgroundColor: theme.colors.accent, paddingHorizontal: theme.sizes.base * 0.25, borderRadius: 12 }} white>{props.coupons.filter(c => new Date(c.validity) > new Date()).length}</Text>
+                            {props.coupons.length !== 0 && <Text style={{fontSize:14, position: 'absolute', bottom: 15, left: -10, backgroundColor: theme.colors.accent, paddingHorizontal: theme.sizes.base * 0.25, borderRadius: 12 }} white>{props.coupons.filter(c => new Date(c.validity) > new Date()).length}</Text>}
                             <Text style={{paddingLeft: 12}} size={18}>Coupons</Text>
                             </Block>
                        </TouchableOpacity>
@@ -119,7 +119,7 @@ const Menu = (props) => {
                                 <Text style={{paddingLeft: 12}} size={18}>Settings</Text>
                             </Block>
                        </TouchableOpacity>
-                       <TouchableOpacity style={styles.menuItem} onPress={() => props.navigation.navigate("ContactUs")}>
+                       <TouchableOpacity style={styles.menuItem} onPress={() => props.navigation.navigate("Contact Us")}>
                             <Block row>
                             <Icon
                                 name={'phone'}

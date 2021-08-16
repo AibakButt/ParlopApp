@@ -2,13 +2,16 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { Block, Text} from '../components'
 import { theme } from '../constants'
-import { StyleSheet, TouchableOpacity, ScrollView, TextInput, KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, TouchableOpacity, ScrollView, TextInput, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import RNPickerSelect from 'react-native-picker-select';
 import { handleTextChange, submitContactUs } from './../redux/actions/contactUsActions';
+import { useState } from 'react';
 
 function ContactUs (props) {
    
     const { contactUs } = props
+
+    const [isLoading, setIsLoading] = useState(false)
 
     return (
         <KeyboardAvoidingView flex={1} behavior="padding">
@@ -75,10 +78,12 @@ function ContactUs (props) {
                 </ScrollView>
             </Block>
             <Block flex={0.1} >
-                <TouchableOpacity style={styles.submitButton} onPress={() => props.submitContactUs()} >
+                <TouchableOpacity style={styles.submitButton} disabled={isLoading} onPress={async () => {setIsLoading(true); await props.submitContactUs(); setIsLoading(false);}} >
                    
                         <Text white size={16} bold center> 
-                           Submit
+                          {
+                              isLoading ? <ActivityIndicator size={15} color={theme.colors.white} /> : "Submit"
+                          }
                         </Text>
                    
                 </TouchableOpacity>

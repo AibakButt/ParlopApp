@@ -67,8 +67,6 @@ class Register extends Component {
     super();
 
     this.state = {
-        codeFeildShow: false,
-        nameShow: false,
         showTextInput: 'phone',
         showLoading: false
     }
@@ -168,7 +166,7 @@ class Register extends Component {
     try {
       this.setState({showLoading: true})
       await this.props.sendVerificationCode()
-      this.setState({showLoading: false, nameShow: 'password'})
+      this.setState({showLoading: false, showTextInput: 'password'})
     } catch (error) {
       this.setState({showLoading: false})
     }
@@ -301,6 +299,7 @@ class Register extends Component {
     return (
       <Block>
           <TextInput
+              secureTextEntry={true}
               placeholder="Password"
               value={this.props.auth.password}
               onChangeText={(e) => this.props.handleTextChange(e,"password")}
