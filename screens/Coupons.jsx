@@ -1,24 +1,11 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from '../components'
-import { ScrollView } from 'react-native';
+import { RefreshControl, ScrollView } from 'react-native';
 import { theme } from '../constants';
 import { fetchCoupons } from './../redux/actions/couponActions';
 import Icon from '../components/Icon';
 
-const coupons = [{
-    code: "CINM213",
-    description: "350 off on youe next order",
-    discountPercertage: "12",
-    discountPrice: "500",
-    validity: new Date()
-},{
-    code: "CINM213",
-    description: "350 off on youe next order",
-    discountPercertage: "12",
-    discountPrice: "500",
-    validity: new Date()
-}]
 
 function Coupons (props) {
 
@@ -27,6 +14,8 @@ function Coupons (props) {
         props.fetchCoupons();
         
       }, []);
+      
+    const [refreshing, setRefreshing] = useState(false)
 
     const { coupons } = props
     if(coupons && coupons.length === 0 ){
@@ -41,11 +30,25 @@ function Coupons (props) {
                 <Text gray center size={20} style={{padding: theme.sizes.base}}>No Coupons</Text>
             </Block>
         )
+        
+    }
+
+    onRefresh = async () => {
+        setRefreshing(true);
+        await props.fetchCoupons();
+        setRefreshing(false);
     }
 
     return (
         <Block>
-            <ScrollView>
+            <ScrollView
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                    />
+                }
+            >
                 {
                     coupons.map(coupon => (
                         <Block key={coupon.code} color={theme.colors.white} padding={theme.sizes.base} margin={[theme.sizes.base * 0.5,theme.sizes.base,theme.sizes.base*0.5,theme.sizes.base]} style={{borderRadius: 12}}>
@@ -66,14 +69,16 @@ function Coupons (props) {
                             </Block>
                             <Block row space="between" paddingTop={theme.sizes.base*0.75}>
                                 <Text bold center>Rs.{coupon.validMinimum} <Text gray>minimum</Text></Text>
-                                <Text gray center>Valid until: 
-                                    {
-                                        new Date(coupon.validity) > new Date() ?  (
-                                            <Text bold black>{new Date(coupon.validity).toDateString()}</Text>
-                                        ) : (
-                                            <Text accent> Expired</Text>
-                                        )
-                                    }
+                                <Text gray center>
+                                {
+                                    (new Date(coupon.validity) > new Date()) ?
+                                    (<><Text>Valid until: </Text><Text bold black>{new Date(coupon.validity).toDateString()}</Text></> ): 
+                                    (<Text gray>Expired</Text>)
+                                }
+                                     
+                                    
+
+
                                 </Text>
                             </Block>
                         </Block>

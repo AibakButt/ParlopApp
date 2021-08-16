@@ -224,6 +224,7 @@ class Login extends Component {
       <Block>
         <TextInput
             placeholder="Password"
+            secureTextEntry={true}
             value={this.props.auth.password}
             onChangeText={(e) => {this.props.handleTextChange(e,'password')}}
             style={styles.textInput}

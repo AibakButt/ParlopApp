@@ -43,7 +43,7 @@ function App(props) {
       <Provider store={store}>
         <NavigationContainer>
             <AppStackScreens/>
-            <FlashMessage position="top" />
+            <FlashMessage position="top" duration={3000}/>
         </NavigationContainer>
       </Provider>
   );

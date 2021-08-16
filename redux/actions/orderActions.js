@@ -57,7 +57,7 @@ export const handleTextChange = async (dispatch, field ,value) => {
       order[field] = value
       console.log(order)
       dispatch({
-          type: ActionTypes.HANDLE_TEXT_CHANGE,
+          type: ActionTypes.HANDLE_TEXT_CHANGE_ORDER,
           payload: order,
     });
   } catch (error) {
@@ -148,7 +148,7 @@ export const endServiceTime = async (dispatch, order, navigation) => {
     orders[index].end_time = new Date();
     orders[index].status = "Completed";
 
-    navigation.push("OrderCompleted")
+    navigation.push("Order Completed")
 
     dispatch({
       type: ActionTypes.END_TIME,

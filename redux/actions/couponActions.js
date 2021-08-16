@@ -21,9 +21,10 @@ export const fetchCoupons = async (dispatch) => {
 
 export const applyCoupon = async (dispatch) => {
   try {
-    console.log("Applying Coupon")
+
     const { data } = await axios.get(apiEndPoint+"/"+ (await getCurrentCustomer()).id);
     let coupon = {...store.getState().couponReducer.coupon};
+    let totalBill = store.getState().cartReducer.totalBill;
     
     let couponFound = data.customer.coupons.filter(c => (c.code.toUpperCase().trim() == coupon.code.toUpperCase().trim())?true:false)
     if(couponFound.length===0){
@@ -34,17 +35,27 @@ export const applyCoupon = async (dispatch) => {
       });
       return;
     }
+    //IF Found, check valid minimum
 
-    if(new Date(couponFound[0].validity) < new Date()) {
+    if(couponFound[0].validMinimum > totalBill){
+      console.log('checkk')
       showMessage({
-        message: "Coupon Expired",
+        message: `This coupon is only valid for order minimum Rs.${couponFound[0].validMinimum}`,
         type: "danger",
         floating: true
       });
       return;
     }
-     
-    console.log("Coupon Found",couponFound, coupon.code)
+
+    if(new Date(couponFound[0].validity) < new Date()){
+      console.log('checkk')
+      showMessage({
+        message: `Sorry! This coupon is expired}`,
+        type: "danger",
+        floating: true
+      });
+      return;
+    }
 
 
     let order = {...store.getState().orderReducer.order};
@@ -53,7 +64,7 @@ export const applyCoupon = async (dispatch) => {
     order.discount = couponObj && couponObj.discount ? order.price * couponObj.discount / 100 : couponObj.price
     order.coupon = couponObj && couponObj.code
 
-    console.log("order coupons...",order)
+    // console.log("order coupons...",order)
     dispatch({
       type: UPDATE_ORDER,
       payload: order,

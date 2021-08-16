@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from './../components/index';
-import { TouchableOpacity, useWindowDimensions, NativeModules, Platform, StyleSheet, ScrollView, Animated, Image, Dimensions} from 'react-native';
+import { RefreshControl, TouchableOpacity, useWindowDimensions, NativeModules, Platform, StyleSheet, ScrollView, Animated, Image, Dimensions, ActivityIndicator} from 'react-native';
 import {Collapse, CollapseHeader, CollapseBody} from 'accordion-collapse-react-native';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import { theme } from '../constants';
 import Icon from '../components/Icon';
 import Modal from 'react-native-modal';
 import { endServiceTime, startServiceTime, fetchOrders } from './../redux/actions/orderActions';
+import { showMessage } from 'react-native-flash-message';
 const { width, height } = Dimensions.get("window");
 
 const { StatusBarManager } = NativeModules;
@@ -21,6 +22,8 @@ const Bookings = (props) => {
       }, []);
 
     const [modalShow, setModalShow] = useState(null)
+    const [refreshing, setRefreshing] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
 
     const getAMPM = (hours) => {
       
@@ -117,7 +120,7 @@ const Bookings = (props) => {
         )
     }
 
-    const renderBookingCard = (booking) => {
+    const renderBookingCard = (booking, bookingType) => {
         return (
             
                     <Block key={booking._id} color={theme.colors.white} padding={theme.sizes.base} margin={[theme.sizes.base * 0.5,theme.sizes.base,theme.sizes.base*0.5,theme.sizes.base]} style={{borderRadius: 12}}>
@@ -144,30 +147,55 @@ const Bookings = (props) => {
                         </Block>
                         <Block row space="between" paddingTop={theme.sizes.base*0.75}>
                             <TouchableOpacity onPress={() => setModalShow(booking.orderNo)}>
-                                <Text gray center>Beauticain: <Text bold black>{booking.employee ? booking.employee.name : booking.status}</Text></Text>
+                                <Text gray center>Beautician: <Text bold black>{booking.employee ? booking.employee.name : booking.status}</Text></Text>
                             </TouchableOpacity>
                             <Text center>Total: <Text bold >Rs.</Text><Text bold accent>{booking.orderTotal}</Text></Text>
                         </Block>
                         {
-                            booking.start_time && booking.start_time !== "" ? (
-                                <Block center marginTop={theme.sizes.body}>
+                            bookingType === "active" && (
+                                booking.start_time && booking.start_time !== "" ? (
+                                    <Block center marginTop={theme.sizes.body}>
+                                        
+                                        <Text style={{alignSelf: 'flex-start'}} size={12} gray>Beautician started service started at <Text bold>{(((new Date(booking.start_time).getHours() % 12) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getHours() % 12)) : (new Date(booking.start_time).getHours() % 12)) + 
+                                        ":" + (((new Date(booking.start_time).getMinutes()) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getMinutes() )) : (new Date(booking.start_time).getMinutes() ))  + 
+                                        "  " + getAMPM(new Date(booking.start_time).getHours())}</Text></Text>
+                                        <TouchableOpacity 
+                                            style={styles.startButton}
+                                            disabled={isLoading}
+                                            onPress={async () => {setIsLoading(true); await props.endServiceTime(booking, props.navigation);setIsLoading(false)} }>
+                                            <Text style={{marginVertical: 3}} center white size={16}>
+                                                {
+                                                    isLoading ? (<ActivityIndicator size={15} color={theme.colors.white}/>) : "End"
+                                                }
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </Block>
+                                ) : (
+                                    <Block center marginTop={theme.sizes.body}>
+                                        
+                                        <Text style={{alignSelf: 'flex-start'}} size={12} gray>When your beautician arrives press the start button</Text>
+                                        {
+                                            booking.status === "Pending" ? (
+                                                <TouchableOpacity style={styles.startButton} disabled={isLoading} 
+                                                    onPress={() => { showMessage("You cannot start order until your beutician is not assigned") }}>
+                                                    <Text style={{marginVertical: 3}} center size={16} white>
+                                                         Start
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            ) : (
+                                                <TouchableOpacity style={styles.startButton} disabled={isLoading} 
+                                                    onPress={async () => {setIsLoading(true); await props.startServiceTime(booking); setIsLoading(false)} }>
+                                                    <Text style={{marginVertical: 3}} center size={16} white>
+                                                        {
+                                                            isLoading ? (<ActivityIndicator size={15} color={theme.colors.white}/>) : "Start"
+                                                        }
+                                                    </Text>
+                                                </TouchableOpacity>
+                                            )
+                                        }
+                                    </Block>
                                     
-                                    <Text style={{alignSelf: 'flex-start'}} size={12} gray>Beautician started service started at <Text bold>{(((new Date(booking.start_time).getHours() % 12) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getHours() % 12)) : (new Date(booking.start_time).getHours() % 12)) + 
-                                    ":" + (((new Date(booking.start_time).getMinutes()) + "" ).length === 1 ? ("0"+(new Date(booking.start_time).getMinutes() )) : (new Date(booking.start_time).getMinutes() ))  + 
-                                    "  " + getAMPM(new Date(booking.start_time).getHours())}</Text></Text>
-                                    <TouchableOpacity style={styles.startButton} onPress={() => props.endServiceTime(booking, props.navigation)}>
-                                        <Text style={{marginVertical: 3}} center white size={16}>End</Text>
-                                    </TouchableOpacity>
-                                </Block>
-                            ) : (
-                                <Block center marginTop={theme.sizes.body}>
-                                    
-                                    <Text style={{alignSelf: 'flex-start'}} size={12} gray>When your beautician arrives press the start button</Text>
-                                    <TouchableOpacity style={styles.startButton} disabled={booking.status === "Pending"} onPress={() => props.startServiceTime(booking) }>
-                                        <Text style={{marginVertical: 3}} center white size={16}>Start</Text>
-                                    </TouchableOpacity>
-                                </Block>
-                                
+                                )
                             )
                         }
                         <Collapse>
@@ -195,54 +223,84 @@ const Bookings = (props) => {
     ]);
 
     const ActiveBookings = () => {
+        if(refreshing)
+          return (
+              <ActivityIndicator size={25} color={theme.colors.accent}/>
+            ) 
         if(props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').length === 0){
             return(
                 <Block center middle flex={1} color={theme.colors.white}> 
-                    <Icon
-                        name="book"
-                        type="ant"
-                        color={theme.colors.gray}
-                        size={40}
-                    /> 
-                    <Text gray center size={20} style={{padding: theme.sizes.base}}>No Active Bookings</Text>
+                        <Icon
+                            name="book"
+                            type="ant"
+                            color={theme.colors.gray}
+                            size={40}
+                        /> 
+                        <Text gray center size={20} style={{padding: theme.sizes.base}}>No Active Bookings</Text>
+                        <TouchableOpacity onPress={() => onRefresh()}>
+                            <Text gray>Tap to Refresh</Text>
+                        </TouchableOpacity>
                 </Block>
             )       
         }
         else{
             return (
-                <Block color={theme.colors.gray2}>
-                    <ScrollView>
-                        {
-                            props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').map((booking ,index) => (
-                               renderBookingCard(booking)
-                            ))
+                <ScrollView
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
                         }
-                    </ScrollView>
-                </Block>
+                    >
+                            <Block color={theme.colors.gray2}>
+                                {
+                                    props.bookings && props.bookings.filter(booking => booking.status==='Pending' || booking.status === 'Working' || booking.status === 'Assigned').map((booking ,index) => (
+                                    renderBookingCard(booking,"active")
+                                    ))
+                                }
+                            </Block>
+                </ScrollView>
             )
         }
     };
       
       const PastBookings = () => {
+          if(refreshing)
+          return (
+              <ActivityIndicator size={25} color={theme.colors.accent}/>
+            )
         if(props.bookings && props.bookings.filter(booking => booking.status==='Cancel' || booking.status === 'Completed').length === 0){
             return(
-                <Block center middle flex={1} color={theme.colors.white}> 
-                    <Icon
-                        name="book"
-                        type="ant"
-                        color={theme.colors.gray}
-                        size={40}
-                    /> 
-                    <Text gray center size={20} style={{padding: theme.sizes.base}}>No Past Bookings</Text>
-                </Block>
+                
+                    <Block center middle flex={1} color={theme.colors.white}> 
+                        <Icon
+                            name="book"
+                            type="ant"
+                            color={theme.colors.gray}
+                            size={40}
+                        /> 
+                        <Text gray center size={20} style={{padding: theme.sizes.base}}>No Past Bookings</Text>
+                        <TouchableOpacity onPress={() => onRefresh()}>
+                            <Text gray>Tap to Refresh</Text>
+                        </TouchableOpacity>
+                    </Block>
+               
             )       
         }
         return (
             <Block color={theme.colors.gray2}>
-                    <ScrollView>
+                    <ScrollView
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={onRefresh}
+                            />
+                        }
+                    >
                         {
                             props.bookings && props.bookings.filter(booking => booking.status==='Cancel' || booking.status === 'Completed' ).map((booking, index) => (
-                               renderBookingCard(booking)
+                               renderBookingCard(booking,"past")
                             ))
                         }
                     </ScrollView>
@@ -280,10 +338,15 @@ const Bookings = (props) => {
         );
       };
 
-
+      onRefresh = async () => {
+        setRefreshing(true);
+        await props.fetchBookings();
+        setRefreshing(false);
+      }
    
 
     return (
+
         <Block style={styles.header} >
             <TabView
                 navigationState={{ index, routes }}
@@ -294,6 +357,7 @@ const Bookings = (props) => {
                 style={{backgroundColor: theme.colors.white}}
             />
         </Block>
+
     )
 }
 

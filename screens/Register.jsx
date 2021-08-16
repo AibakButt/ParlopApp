@@ -299,6 +299,7 @@ class Register extends Component {
     return (
       <Block>
           <TextInput
+              secureTextEntry={true}
               placeholder="Password"
               value={this.props.auth.password}
               onChangeText={(e) => this.props.handleTextChange(e,"password")}

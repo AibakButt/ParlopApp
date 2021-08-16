@@ -1,13 +1,14 @@
 import React, {useRef} from 'react'
 import { connect } from 'react-redux'
 import { Block, Text } from '../components'
-import { ScrollView, Image, StyleSheet,TouchableOpacity } from 'react-native';
+import { ScrollView, Image, StyleSheet,TouchableOpacity, ActivityIndicator } from 'react-native';
 import { theme } from '../constants';
 import { useEffect } from 'react';
 import { addServicesFromCart, submitOrder } from './../redux/actions/orderActions';
 import RBSheet from "react-native-raw-bottom-sheet";
 import { TextInput } from 'react-native';
 import { applyCoupon, handleTextChange } from '../redux/actions/couponActions';
+import { useState } from 'react';
 
 
 
@@ -19,7 +20,7 @@ function OrderSummary (props) {
 
       }, []);
 
-
+      const [isLoading, setIsLoading] = useState(false)
       
     const getAMPM = (hours) => {
         
@@ -30,7 +31,7 @@ function OrderSummary (props) {
 
         try {
             await props.submitOrder()
-            props.navigation.navigate("OrderPlaced")
+            props.navigation.navigate("Order Placed")
         } catch (error) {
             console.log(error)
         }
@@ -99,7 +100,8 @@ function OrderSummary (props) {
                     </Block>
                     <Block flex={3} color={theme.colors.black} margin={theme.sizes.base} style={{borderRadius: 12}}>
                         <Text accent size={22} style={{padding: theme.sizes.base, paddingBottom: 0}}>
-                            { order.date.toDateString()}
+                            {console.log(order.date)}
+                            { new Date(order.date).toDateString()}
                         </Text>
                         <Text white size={15} style={{padding: theme.sizes.base}}>
                             { 
@@ -193,9 +195,11 @@ function OrderSummary (props) {
                </Block>
 
                <Block>
-                   <TouchableOpacity style={styles.button} onPress={() => submitOrder()}>
+                   <TouchableOpacity disabled={isLoading} style={styles.button} onPress={async () => {setIsLoading(true); await submitOrder(); setIsLoading(false);}}>
                        <Text white bold center>
-                           Submit Order
+                           {
+                               isLoading ? ( <ActivityIndicator size={15} color={theme.colors.white} />) : "Submit Order"
+                           }
                        </Text>
                    </TouchableOpacity>
                </Block>

@@ -3,17 +3,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { theme } from '../constants';
 import Home from './../screens/Home';
 import Services from './../screens/Services';
-import Cart from './../screens/Cart';
-import ScheduleOrder from './../screens/ScheduleOrder';
-import OrderSummary from './../screens/OrderSummary';
-import OrderPlaced from './../screens/OrderPlaced';
-import Bookings from './../screens/Bookings';
-import OrderCompleted from './../screens/OrderCompleted';
-import Coupons from './../screens/Coupons';
-import FAQS from './../screens/FAQS';
-import Settings from './../screens/Settings';
-import ContactUs from './../screens/ContactUs';
-import Menu from './../screens/Menu';
 
 
 const HomeStack = createStackNavigator();

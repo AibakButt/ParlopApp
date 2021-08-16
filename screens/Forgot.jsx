@@ -68,7 +68,7 @@ class Forgot extends Component {
     super();
 
     this.state = {
-        showTextInput: 'phone',
+        showTextInput: 'code',
         showLoading: false
     }
 
@@ -136,29 +136,11 @@ class Forgot extends Component {
 
   }
 
-  sendPhoneNo = async () => {
-
-    if((this.props.auth.phone).length !== 10 || this.props.auth.phone.charAt(0) != '3'){
-      showMessage({
-        message: "Phone number is not valid",
-        type: "danger",
-        floating: true
-      });
-      this.props.handleTextChange("", 'phone')
-      return
-    } 
-
-    try {
-      this.setState({showLoading: true})
-      await this.props.sendPhoneNo()
-      this.setState({showLoading: false, showTextInput: 'code'})
-    } catch (error) {
-      this.setState({showLoading: false})
-      console.log(error)
-    }
-   
-
+  async componentDidMount() {
+    await this.props.sendPhoneNo()
+    showMessage("Code has been sent to your number")
   }
+  
   sendVerificationCode = async () => {
 
     try {
@@ -283,7 +265,8 @@ class Forgot extends Component {
                     <ActivityIndicator size="small" color={theme.colors.white} />
                     ) : (
                     <Text bold white>
-                        Save and Login
+                        Create New Password
+
                     </Text>
                   )
                 }
@@ -329,7 +312,10 @@ class Forgot extends Component {
                 transform: [{ translateY: this.buttonY }]
               }}
             >
-              <Text white bold >Recover Password</Text>
+              <TouchableOpacity onPress={ () => sendVerificationCode}>
+                <Text white bold >Recover Password</Text>
+              </TouchableOpacity>
+
             </Animated.View>
           </TapGestureHandler>
           
@@ -349,10 +335,7 @@ class Forgot extends Component {
                             </TouchableWithoutFeedback>
                         </Animated.View>
                     </TapGestureHandler>
-            
-            {
-                this.state.showTextInput === 'phone' && this.renderPhoneInput()
-            }
+  
             {
                 this.state.showTextInput === 'code' && this.renderCodeInput()
             }

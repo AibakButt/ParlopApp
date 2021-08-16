@@ -12,7 +12,7 @@ function BookingsStackScreens() {
     return (
       <BookingsStack.Navigator>
         <BookingsStack.Screen name="Bookings" component={Bookings} options={defaultOptions}/>
-        <BookingsStack.Screen name="OrderCompleted" component={OrderCompleted} />
+        <BookingsStack.Screen name="Order Completed" component={OrderCompleted} />
       </BookingsStack.Navigator>
     );
 }

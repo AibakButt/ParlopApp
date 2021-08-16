@@ -8,7 +8,8 @@ import {
   FlatList,
   Animated,
   Modal,
-  NativeModules
+  NativeModules,
+  ActivityIndicator
 } from "react-native";
 import { connect } from "react-redux";
 import {
@@ -45,15 +46,32 @@ function Home(props) {
   let scrollX = new Animated.Value(0);
 
   useEffect(() => {
-    setCategoryLoading(true)
-    setDealsLoading(true)
 
-    props.fetchCategories();
-    props.fetchServices();
-    setCategoryLoading(false)
+    const fetch = async () => {
+      
+      
+      if(props.categories.length===0){
+        setCategoryLoading(true)
+        await props.fetchCategories();
+        setCategoryLoading(false)
+      }
 
-    props.fetchDealImages();
-    setDealsLoading(false)
+      if(props.dealImages.length === 0){
+        setDealsLoading(true)
+        await props.fetchDealImages();
+        setDealsLoading(false)
+      }
+      
+      if(props.services.length === 0){
+        props.fetchServices();
+      }
+      
+      
+      
+      
+    }
+
+    fetch()
     
   }, []);
 
@@ -62,33 +80,38 @@ function Home(props) {
   const renderCarousel = () => {
   
     return (
-    
-        <FlatList
-        horizontal
-        pagingEnabled
-        scrollEnabled
-        showsHorizontalScrollIndicator={false}
-        data={props.dealImages}
-        keyExtractor={(item, index) => `${index}`}
-        renderItem={({ item }) => (
+   
+          <FlatList
+            horizontal
+            pagingEnabled
+            scrollEnabled
+            showsHorizontalScrollIndicator={false}
+            data={props.dealImages}
+            keyExtractor={(item, index) => `${index}`}
+            renderItem={({ item }) => (
 
-            <Block middle center >
-              
-              <Image
-                source={{ uri: item.image}}
-                resizeMode="contain"
-                style={{ width: width - theme.sizes.base * 2, height: height / 2, overflow: "visible", borderRadius: 12}}
-              />
-            </Block>
-  
-        )}
-        onScroll={Animated.event([
-          {
-            nativeEvent: { contentOffset: { x: scrollX } }
-          },
-        ],
-        {useNativeDriver: false})}
-      />
+                <Block middle center >
+                  
+                  <Image
+                    source={{ uri: item.image}}
+                    resizeMode="contain"
+                    style={{ width: width - theme.sizes.base * 2, height: height / 2, overflow: "visible", borderRadius: 12}}
+                  />
+                </Block>
+      
+            )}
+            onScroll={Animated.event([
+              {
+                nativeEvent: { contentOffset: { x: scrollX } }
+              },
+            ],
+            {useNativeDriver: false})}
+          />
+        
+     
+     
+
+        
   
     );
   }
@@ -145,7 +168,16 @@ function Home(props) {
         
 
         <Block color={theme.colors.white} flex={4} style={{paddingHorizontal: theme.sizes.base, }}>
-          {renderCarousel()}
+          {
+            dealsLoading ? (
+                  <Block center middle>
+                    <ActivityIndicator size="small" color={theme.colors.accent}  />
+                  </Block>
+            ) : (
+              renderCarousel()
+
+            )
+          }
         </Block>
         <Block flex={0.5} padding={15} color={theme.colors.white}>
             <Text center size={20} accent bold>CATEGORIES</Text>
@@ -156,9 +188,13 @@ function Home(props) {
           style={{ marginBottom: theme.sizes.base * 1.5,  paddingVertical: theme.sizes.base * 0.5,  }}
         >
           <Block row space="between" style={styles.categories}>
-            {console.log(props.services)}
-            {categoryLoading ? <ActivityIndicator size="small" color={theme.colors.accent} /> : <></>}
-            {categories && categories.map(category => (
+            {/* {console.log(props.services)} */}
+            {categoryLoading ? (
+              <Block center middle>
+                <ActivityIndicator size="small" color={theme.colors.accent} />
+              </Block>
+            ) : <>
+              {categories && categories.map(category => (
               <TouchableOpacity
                 key={category._id}
                 onPress={() => navigation.navigate("Services",  category )}
@@ -187,6 +223,8 @@ function Home(props) {
                 </Card>
               </TouchableOpacity>
             ))}
+            </>}
+            
           </Block>
         </ScrollView>
         </Block>

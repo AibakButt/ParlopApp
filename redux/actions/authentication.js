@@ -27,7 +27,7 @@ export const sendPhoneNo = async (dispatch) => {
   } catch (error) {
     console.log(error);
     showMessage({
-      message: "Verification code cannot be sent. Please try again",
+      message: error.response.data.message,
       type: "danger",
       floating: true
     });
@@ -47,7 +47,7 @@ export const sendVerificationCode = async (dispatch) => {
         type: ActionTypes.VERIFY_CODE,
         payload: auths,
       });
-
+      console.log("Code Verified")
     } catch (error) {
       console.log(error.message);
       showMessage({
@@ -85,9 +85,7 @@ export const registerCustomer = async (dispatch) => {
     let auths = {...store.getState().authReducer.auth};
     
     const { data } = await axios.post(apiEndPoint + "/" , {phoneNumber: "+92"+auths.phone, nameCustomer: auths.name, password: auths.password});
-
-
-    
+    console.log(data)
     try {
       await AsyncStorage.setItem("customer", JSON.stringify(data.token) );
     } catch (error) {
@@ -121,7 +119,7 @@ export const handleTextChange = (dispatch, value, field) => {
     auth[field] = value
 
     dispatch({
-      type: ActionTypes.HANDLE_TEXT_CHANGE,
+      type: ActionTypes.HANDLE_TEXT_CHANGE_AUTH,
       payload: auth,
     });
 };

@@ -50,7 +50,7 @@ const Cart = (props) => {
               );
         }
         if(customer){
-            props.navigation.navigate("ScheduleOrder")
+            props.navigation.navigate("Schedule Order")
         }
     }
     

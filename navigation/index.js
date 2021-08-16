@@ -12,8 +12,6 @@ const defaultOptions = {
 const AppStack = createStackNavigator();
 
 
-
-
 function AppStackScreens() {
 
   const [firstTime, setFirstTime] = useState(true);

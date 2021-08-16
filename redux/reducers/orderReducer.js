@@ -24,7 +24,7 @@ export const orderReducer = (state = initialState, action) => {
   switch (action.type) {
     case ActionTypes.ADD_SERVICES_FROM_CART:
       return { ...state, order: action.payload };
-    case ActionTypes.HANDLE_TEXT_CHANGE:
+    case ActionTypes.HANDLE_TEXT_CHANGE_ORDER:
       return { ...state, order: action.payload };
     case ActionTypes.UPDATE_ORDER:
       return { ...state, order: action.payload };

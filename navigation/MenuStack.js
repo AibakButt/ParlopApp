@@ -24,7 +24,7 @@ function MenuStackScreens() {
         <MenuStack.Screen name="Coupons" component={Coupons} options={defaultOptions}/>
         <MenuStack.Screen name="FAQS" component={FAQS} options={defaultOptions} />
         <MenuStack.Screen name="Settings" component={Settings} options={defaultOptions}/>
-        <MenuStack.Screen name="ContactUs" component={ContactUs} options={defaultOptions}/>
+        <MenuStack.Screen name="Contact Us" component={ContactUs} options={defaultOptions}/>
        </MenuStack.Navigator>
     );
 }
