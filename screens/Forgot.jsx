@@ -6,7 +6,7 @@ import Icon from '../components/Icon';
 import { connect } from "react-redux";
 import {  
   handleTextChange, 
-  sendPhoneNo,
+  getCode,
   sendVerificationCode,
   resendCode,
   createNewPassword,
@@ -137,7 +137,7 @@ class Forgot extends Component {
   }
 
   async componentDidMount() {
-    await this.props.sendPhoneNo()
+    await this.props.getCode()
     showMessage("Code has been sent to your number")
   }
   
@@ -193,7 +193,7 @@ class Forgot extends Component {
             />
         </Block>
         <Block>
-            <TouchableOpacity style={styles.next} onPress={() => this.sendPhoneNo()}>
+            <TouchableOpacity style={styles.next} onPress={() => this.getCode()}>
                 {
                   this.state.showLoading ? (
                     <ActivityIndicator size="small" color={theme.colors.white} />
@@ -361,7 +361,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = (dispatch) => ({
     handleTextChange: (value, field) => handleTextChange(dispatch, value, field),
-    sendPhoneNo: () => sendPhoneNo(dispatch),
+    getCode: () => getCode(dispatch),
     sendVerificationCode: () => sendVerificationCode(dispatch),
     resendCode: () => resendCode(dispatch),
     createNewPassword: () => createNewPassword(dispatch),

@@ -10,7 +10,7 @@ import { showMessage, hideMessage } from "react-native-flash-message";
 import { handleTextChange } from './../redux/actions/orderActions';
 import { getCurrentCustomer } from '../redux/actions/authentication';
 import RNPickerSelect from 'react-native-picker-select';
-
+import moment from 'moment';
 
 
 
@@ -52,14 +52,30 @@ function ScheduleOrder(props) {
         if(!selectedDate) return 
 
         let now  = new Date()
-        if(selectedDate.getTime() < now.getTime()){
+        
+        if(moment(selectedDate).isBefore(now,'date')){
             showMessage({
                 message: "Date can only be selected onwards from today",
                 type: "danger",
                 floating: true
               });
             setDate(date);
-        }else{
+        }
+        else if (moment(selectedDate).isSame(now,'date')){
+            var timeAndDate = moment().set({'hour': 17, 'minute': 0,'second':0});
+            if (moment(selectedDate).isAfter(timeAndDate)){
+                showMessage({
+                    message: "Time out for the day, please select some coming day",
+                    type: "danger",
+                    floating: true
+                  });
+                setDate(date);
+            } else {
+                setDate(selectedDate);
+                props.handleTextChange(selectedDate,"date")
+            }
+            
+        } else{
             setDate(selectedDate);
             props.handleTextChange(selectedDate,"date")
         }
@@ -67,10 +83,9 @@ function ScheduleOrder(props) {
 
     const onChangeTime = (selectedTime) => {
 
-        let startTime = 9
-        let endTime = 21
-        let diff = 4
-
+        let startTime = moment().set({'hour': 9, 'minute': 0,'second':0}).format();
+        let endTime = moment().set({'hour': 21, 'minute': 0,'second':0}).format();
+console.log('startTime',startTime,"endTime",endTime);
         setShowTimePicker(false);
 
         //when cancel button press
@@ -78,42 +93,82 @@ function ScheduleOrder(props) {
 
         const currentTime = selectedTime || time;
         let now  = new Date()
-        let sameDay = date.getTime() === now.getTime()
+        let sameDay = moment(date).isSame(now,'date')
 
         if(sameDay){
             //selected time on a same day should greater than now...
-            if(selectedTime.getHours() < new Date().getHours()){
+            console.log('4 hours sub',moment(selectedTime).subtract(4,'hours').format())
+            if (
+                moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
+                || 
+                moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
+            ) {
                 showMessage({
-                    message: "Selected time should be 4 hours greater than now",
-                    type: "danger",
-                    floating: true
-                  });
-            }
-            // if(selectedTime.getHours() < )
-            if(selectedTime.getHours() + diff  >= startTime && selectedTime.getHours() + diff <= endTime ){
+                            message: "Selected time should be 4 hours greater than now",
+                            type: "danger",
+                            floating: true
+                          });
+            } else if (
+                moment(selectedTime).isAfter(startTime) 
+                &&
+                moment(selectedTime).isBefore(endTime)
+            ) {
                 setTime(currentTime);
                 props.handleTextChange(selectedTime,"time")
-            }
-            else{
+            } else {
                 showMessage({
-                    message: "On a same day order time should be 4 hours after than now  be selected from 4:59 AM to 4:59 PM",
+                    message: "On a same day order time should be 4 hours after than now and be selected from 9:00 AM to 9:00 PM",
                     type: "danger",
                     floating: true
-                  });
+                });
             }
-        }
-        else{
-            if(selectedTime.getHours() >= startTime && selectedTime.getHours() <= endTime ){
+            // if(selectedTime.getHours() < new Date().getHours()){
+            //     showMessage({
+            //         message: "Selected time should be 4 hours greater than now",
+            //         type: "danger",
+            //         floating: true
+            //       });
+            // }
+            // // if(selectedTime.getHours() < )
+            // if(selectedTime.getHours() + diff  >= startTime && selectedTime.getHours() + diff <= endTime ){
+            //     setTime(currentTime);
+            //     props.handleTextChange(selectedTime,"time")
+            // }
+            // else{
+            //     showMessage({
+            //         message: "On a same day order time should be 4 hours after than now  be selected from 4:59 AM to 4:59 PM",
+            //         type: "danger",
+            //         floating: true
+            //       });
+            // }
+
+
+        } else {
+            if (
+                moment(selectedTime).isAfter(startTime) 
+                &&
+                moment(selectedTime).isBefore(endTime)
+            ) {
                 setTime(currentTime);
                 props.handleTextChange(selectedTime,"time")
-            }
-            else{
+            } else {
                 showMessage({
-                    message: "Time can only be selected from 8:59 AM to 8:59 PM",
+                    message: "Time can only be selected from 9:00 AM to 9:00 PM",
                     type: "danger",
                     floating: true
-                  });
+                });
             }
+            // if(selectedTime.getHours() >= startTime && selectedTime.getHours() <= endTime ){
+            //     setTime(currentTime);
+            //     props.handleTextChange(selectedTime,"time")
+            // }
+            // else{
+            //     showMessage({
+            //         message: "Time can only be selected from 8:59 AM to 8:59 PM",
+            //         type: "danger",
+            //         floating: true
+            //       });
+            // }
         }
         
     }
