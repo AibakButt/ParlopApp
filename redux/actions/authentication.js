@@ -35,6 +35,34 @@ export const sendPhoneNo = async (dispatch) => {
   }
 };
 
+export const getCode = async (dispatch) => {
+  try {
+    let auths = {...store.getState().authReducer.auth};
+
+    const { data } = await axios.post(apiEndPoint + "/send-code-for-forget", {phoneNumber: "+92"+auths.phone});
+    console.log(data)
+   
+    dispatch({
+      type: ActionTypes.SEND_PHONE_NO,
+      payload: {...auths, request_id: data.request_id},
+    });
+
+    showMessage({
+      message: "Verification code has been sent to your phone number",
+      type: "success",
+      floating: true
+    });
+    
+  } catch (error) {
+    console.log(error);
+    showMessage({
+      message: error.response.data.message,
+      type: "danger",
+      floating: true
+    });
+    throw new Error()
+  }
+};
 
 export const sendVerificationCode = async (dispatch) => {
     try {
