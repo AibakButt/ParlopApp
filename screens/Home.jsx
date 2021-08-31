@@ -146,21 +146,12 @@ function Home(props) {
                 </Block>
               <Block flex={8} paddingLeft={5}>
                 
-                  <RNPickerSelect
+                <TouchableOpacity onPress={() => alert("Our Services are currently available only in LAHORE")}>
+                  <Text style={styles.select}>Lahore</Text>
+                </TouchableOpacity>
                   
-                    value={city}
-                    style={{inputAndroid: styles.select, inputIOS: styles.select, }}
-                    useNativeAndroidPickerStyle={false}
-                    onValueChange={(value) => handleCitySelect(value)}
-                    items={[
-                        {label: 'Lahore', value: 'Lahore' },
-                        {label: 'Islamabad', value: 'Islamabad' },
-                        {label: 'Rawalpindi', value: 'Rawalpindi' },
-                        {label: 'Karachi', value: 'Karachi' },
-                    ]}
-                  />
 
-                </Block>
+              </Block>
           
           </Block>
         </Block>
@@ -283,7 +274,7 @@ const styles = StyleSheet.create({
   },
   select:{
     backgroundColor: theme.colors.white,
-    height: theme.sizes.base * 3,
+    height: theme.sizes.base * 1.5,
     color: theme.colors.accent,
     fontWeight: "bold"
    

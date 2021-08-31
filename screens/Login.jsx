@@ -388,7 +388,7 @@ const styles = StyleSheet.create({
       letterSpacing: 10
   },
   next: {
-    backgroundColor: '#e91e63',
+    backgroundColor: theme.colors.accent,
     height: 50,
     marginHorizontal: theme.sizes.base,
     borderRadius: 12,
@@ -398,7 +398,7 @@ const styles = StyleSheet.create({
   },
   nextOutline: {
     backgroundColor: '#fff',
-    borderColor: '#e91e63',
+    borderColor: theme.colors.accent,
     borderWidth: 1,
     height: 50,
     marginHorizontal: theme.sizes.base,

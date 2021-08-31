@@ -46,7 +46,6 @@ export const handleTextChange = async (dispatch, field ,value) => {
       if(field === "area"){
         if(value === "Other"){
           let {data} = await axios.get(apiEndPoint2)
-          console.log("travel charges....",data)
           order.travelCharges = data.travelCharges[0].charges;
         }
         else{

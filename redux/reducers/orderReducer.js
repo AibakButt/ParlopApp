@@ -3,7 +3,7 @@ import * as ActionTypes from "../types/orderTypes";
 let initialState = {
     order: {
         date: new Date(),
-        time: new Date(),
+        time: new Date(new Date().setHours(0,0,0,0)),
         service: [],
         orderTotal: 0,
         discount: 0,

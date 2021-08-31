@@ -29,7 +29,7 @@ export default function OrderCompleted(props) {
 const styles = StyleSheet.create({
 
     done: {
-        backgroundColor: '#e91e63',
+        backgroundColor: theme.colors.accent,
         height: 50,
         marginHorizontal: theme.sizes.base,
         borderRadius: 12,

@@ -50,7 +50,7 @@ export const applyCoupon = async (dispatch) => {
     if(new Date(couponFound[0].validity) < new Date()){
       console.log('checkk')
       showMessage({
-        message: `Sorry! This coupon is expired}`,
+        message: `Sorry! This coupon is expired`,
         type: "danger",
         floating: true
       });
@@ -72,6 +72,7 @@ export const applyCoupon = async (dispatch) => {
   } catch (error) {
     console.log(error);
   }
+  
 };
 
 export const handleTextChange = async (dispatch, field ,value) => {

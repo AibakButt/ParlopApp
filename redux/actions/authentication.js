@@ -157,7 +157,7 @@ export const checkPhoneNoExists = async (dispatch) => {
     let auths = {...store.getState().authReducer.auth};
 
     const { data } = await axios.post(apiEndPoint + "/phone-no-exists", {phoneNumber: "+92" + auths.phone});
-    // console.log(data)
+    console.log(data)
    
     dispatch({
       type: ActionTypes.SEND_PHONE_NO,

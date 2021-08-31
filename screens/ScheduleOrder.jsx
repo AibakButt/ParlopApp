@@ -15,8 +15,8 @@ import moment from 'moment';
 
 
 function ScheduleOrder(props) {
-    const [date, setDate] = useState(new Date());
-    const [time, setTime] = useState(new Date());
+    // const [date, setDate] = useState(new Date());
+    // const [time, setTime] = useState(new Date(new Date().setHours(0,0,0,0)));
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [showTimePicker, setShowTimePicker] = useState(false);
 
@@ -59,89 +59,73 @@ function ScheduleOrder(props) {
                 type: "danger",
                 floating: true
               });
-            setDate(date);
+           
         }
         else if (moment(selectedDate).isSame(now,'date')){
             var timeAndDate = moment().set({'hour': 17, 'minute': 0,'second':0});
             if (moment(selectedDate).isAfter(timeAndDate)){
                 showMessage({
-                    message: "Time out for the day, please select some coming day",
+                    message: "Sorry! we are closed for today, please select some coming day",
                     type: "danger",
                     floating: true
                   });
-                setDate(date);
             } else {
-                setDate(selectedDate);
-                props.handleTextChange(selectedDate,"date")
+                props.handleTextChange("date",selectedDate)
             }
             
         } else{
-            setDate(selectedDate);
-            props.handleTextChange(selectedDate,"date")
+            props.handleTextChange("date",selectedDate)
         }
-    }
 
-    const onChangeTime = (selectedTime) => {
 
-        let startTime = moment().set({'hour': 9, 'minute': 0,'second':0}).format();
-        let endTime = moment().set({'hour': 21, 'minute': 0,'second':0}).format();
-console.log('startTime',startTime,"endTime",endTime);
+
+
+
+        //Checking Date again
+        if (order.time.getTime() == new Date(new Date().setHours(0,0,0,0)).getTime()) return
+        let selectedTime = props.order.time 
+        let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
+        let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
         setShowTimePicker(false);
 
         //when cancel button press
         if(!selectedTime) return 
 
-        const currentTime = selectedTime || time;
-        let now  = new Date()
-        let sameDay = moment(date).isSame(now,'date')
+        now  = new Date()
+        let sameDay = moment(props.order.date).isSame(now,'date')
 
         if(sameDay){
             //selected time on a same day should greater than now...
-            console.log('4 hours sub',moment(selectedTime).subtract(4,'hours').format())
             if (
-                moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
-                || 
-                moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
-            ) {
-                showMessage({
-                            message: "Selected time should be 4 hours greater than now",
-                            type: "danger",
-                            floating: true
-                          });
-            } else if (
                 moment(selectedTime).isAfter(startTime) 
                 &&
                 moment(selectedTime).isBefore(endTime)
             ) {
-                setTime(currentTime);
-                props.handleTextChange(selectedTime,"time")
+
+                if (
+                    moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
+                    || 
+                    moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
+                ) {
+                    showMessage({
+                                message: "Selected time should be 4 hours greater than now",
+                                type: "danger",
+                                floating: true
+                              });
+                } else {
+                    props.handleTextChange("time",selectedTime)
+                }
+
+
+                
             } else {
                 showMessage({
-                    message: "On a same day order time should be 4 hours after than now and be selected from 9:00 AM to 9:00 PM",
+                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
                     type: "danger",
                     floating: true
                 });
             }
-            // if(selectedTime.getHours() < new Date().getHours()){
-            //     showMessage({
-            //         message: "Selected time should be 4 hours greater than now",
-            //         type: "danger",
-            //         floating: true
-            //       });
-            // }
-            // // if(selectedTime.getHours() < )
-            // if(selectedTime.getHours() + diff  >= startTime && selectedTime.getHours() + diff <= endTime ){
-            //     setTime(currentTime);
-            //     props.handleTextChange(selectedTime,"time")
-            // }
-            // else{
-            //     showMessage({
-            //         message: "On a same day order time should be 4 hours after than now  be selected from 4:59 AM to 4:59 PM",
-            //         type: "danger",
-            //         floating: true
-            //       });
-            // }
-
+          
 
         } else {
             if (
@@ -149,8 +133,7 @@ console.log('startTime',startTime,"endTime",endTime);
                 &&
                 moment(selectedTime).isBefore(endTime)
             ) {
-                setTime(currentTime);
-                props.handleTextChange(selectedTime,"time")
+                props.handleTextChange("time",selectedTime)
             } else {
                 showMessage({
                     message: "Time can only be selected from 9:00 AM to 9:00 PM",
@@ -158,17 +141,70 @@ console.log('startTime',startTime,"endTime",endTime);
                     floating: true
                 });
             }
-            // if(selectedTime.getHours() >= startTime && selectedTime.getHours() <= endTime ){
-            //     setTime(currentTime);
-            //     props.handleTextChange(selectedTime,"time")
-            // }
-            // else{
-            //     showMessage({
-            //         message: "Time can only be selected from 8:59 AM to 8:59 PM",
-            //         type: "danger",
-            //         floating: true
-            //       });
-            // }
+           
+        }
+    }
+
+    const onChangeTime = (selectedTime) => {
+
+        let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
+        let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
+        setShowTimePicker(false);
+
+        //when cancel button press
+        if(!selectedTime) return 
+
+        let now  = new Date()
+        let sameDay = moment(props.order.date).isSame(now,'date')
+
+        if(sameDay){
+            //selected time on a same day should greater than now...
+            if (
+                moment(selectedTime).isAfter(startTime) 
+                &&
+                moment(selectedTime).isBefore(endTime)
+            ) {
+
+                if (
+                    moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
+                    || 
+                    moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
+                ) {
+                    showMessage({
+                                message: "Selected time should be 4 hours greater than now",
+                                type: "danger",
+                                floating: true
+                              });
+                } else {
+                    props.handleTextChange("time",selectedTime)
+                }
+
+
+                
+            } else {
+                showMessage({
+                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
+                    type: "danger",
+                    floating: true
+                });
+            }
+          
+
+        } else {
+            if (
+                moment(selectedTime).isAfter(startTime) 
+                &&
+                moment(selectedTime).isBefore(endTime)
+            ) {
+                props.handleTextChange("time",selectedTime)
+            } else {
+                showMessage({
+                    message: "Time can only be selected from 9:00 AM to 9:00 PM",
+                    type: "danger",
+                    floating: true
+                });
+            }
+           
         }
         
     }
@@ -189,7 +225,7 @@ console.log('startTime',startTime,"endTime",endTime);
             });
             return
         }   
-        if(order.time == ""){
+        if(order.time.getTime() == new Date(new Date().setHours(0,0,0,0)).getTime()){
             showMessage({
                 message: "Please select the time",
                 type: "error",
@@ -206,7 +242,7 @@ console.log('startTime',startTime,"endTime",endTime);
             });
             return
         }
-        if(order.area == ""){
+        if(order.area == null || order.area == ""){
             showMessage({
                 message: "Please select the area",
                 type: "error",
@@ -230,7 +266,7 @@ console.log('startTime',startTime,"endTime",endTime);
                         <Text style={styles.text}>Select Date</Text>
                         <TouchableOpacity  onPress={()=>setShowDatePicker(true)} >
                             <Block row color={theme.colors.white} space="between" style={{marginHorizontal: theme.sizes.base, borderRadius :12}}>
-                                <Text style={[styles.select , {textAlign: 'center', paddingTop: 12}]}>{ date.toDateString().split(' ')[1] + ". " + date.getDate() + ",  " + days[date.getDay()]}</Text>
+                                <Text style={[styles.select , {textAlign: 'center', paddingTop: 12}]}>{ order.date.toDateString().split(' ')[1] + ". " + order.date.getDate() + ",  " + days[order.date.getDay()]}</Text>
                                 <Icon
                                     name={'plus'}
                                     type={ 'entypo'}
@@ -244,7 +280,7 @@ console.log('startTime',startTime,"endTime",endTime);
                             showDatePicker && (
                                 <DateTimePicker
                                     testID="datePicker"
-                                    value={date}
+                                    value={order.date}
                                     mode={'date'}
                                     is24Hour={true}
                                     display="default"
@@ -259,9 +295,9 @@ console.log('startTime',startTime,"endTime",endTime);
                             <Block row color={theme.colors.white} space="between" style={{marginHorizontal: theme.sizes.base, borderRadius :12}}>
                                
                                     <Text style={[styles.select , {textAlign: 'center', paddingTop: 12}]}>
-                                        { (((time.getHours() % 12) + "" ).length === 1 ? ("0"+(time.getHours() % 12)) : (time.getHours() % 12)) + 
-                                        " : " + (((time.getMinutes()) + "" ).length === 1 ? ("0"+(time.getMinutes() )) : (time.getMinutes() ))  + 
-                                        "  " + getAMPM(time.getHours())}
+                                        { (((order.time.getHours() % 12) + "" ).length === 1 ? ("0"+(order.time.getHours() % 12)) : (order.time.getHours() % 12)) + 
+                                        " : " + (((order.time.getMinutes()) + "" ).length === 1 ? ("0"+(order.time.getMinutes() )) : (order.time.getMinutes() ))  + 
+                                        "  " + getAMPM(order.time.getHours())}
                                     </Text>
                                     <Icon
                                         name={'plus'}
@@ -276,7 +312,7 @@ console.log('startTime',startTime,"endTime",endTime);
                         {
                             showTimePicker && (
                                 <DateTimePicker
-                                    value={time}
+                                    value={order.time}
                                     mode={'time'}
                                     is24Hour={false}
                                     display="default"
@@ -356,11 +392,9 @@ console.log('startTime',startTime,"endTime",endTime);
             </Block>
             <Block flex={0.1} >
                 <TouchableOpacity style={styles.orderButton} onPress={() => validate()}>
-                   
                         <Text white size={16} bold center> 
                             Place your order
                         </Text>
-                   
                 </TouchableOpacity>
             </Block>
        </Block>
