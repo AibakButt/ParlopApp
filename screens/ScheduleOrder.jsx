@@ -45,12 +45,7 @@ function ScheduleOrder(props) {
     }, []);
 
 
-    const onChangeDate = (selectedDate) => {
-        setShowDatePicker(false);
-        
-        //when cancel button press
-        if(!selectedDate) return 
-
+    const validateDate = (selectedDate) => {
         let now  = new Date()
         
         if(moment(selectedDate).isBefore(now,'date')){
@@ -59,153 +54,162 @@ function ScheduleOrder(props) {
                 type: "danger",
                 floating: true
               });
+              return false;
            
         }
-        else if (moment(selectedDate).isSame(now,'date')){
-            var timeAndDate = moment().set({'hour': 17, 'minute': 0,'second':0});
-            if (moment(selectedDate).isAfter(timeAndDate)){
-                showMessage({
-                    message: "Sorry! we are closed for today, please select some coming day",
-                    type: "danger",
-                    floating: true
-                  });
-            } else {
-                props.handleTextChange("date",selectedDate)
-            }
-            
-        } else{
-            props.handleTextChange("date",selectedDate)
+
+        return true
+        // else if (moment(selectedDate).isSame(now,'date')){
+        //     var timeAndDate = moment().set({'hour': 17, 'minute': 0,'second':0});
+        //     if (moment(selectedDate).isAfter(timeAndDate)){
+        //         showMessage({
+        //             message: "Sorry! we are closed for today, please select some coming day",
+        //             type: "danger",
+        //             floating: true
+        //           });
+        //           return false;
+        //     }
+        // }
+
+    }
+
+    const onChangeDate = (selectedDate) => {
+        setShowDatePicker(false);
+        //when cancel button press
+        if(!selectedDate) return 
+
+        props.handleTextChange("date",selectedDate) 
+
+    }
+    function sameDayCheck(d1, d2) {
+        return d1.getFullYear() === d2.getFullYear() &&
+          d1.getMonth() === d2.getMonth() &&
+          d1.getDate() === d2.getDate();
+      }
+
+    const validateTime = (selectedTime) => {
+        let nineam = moment().set({'hour': 9, 'minute': 31,'second':0}).format();
+        let ninepm = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
+        let seven = moment().set({'hour': 19, 'minute': 1,'second':0}).format();
+
+        let now  = new Date()
+        let sameDay = sameDayCheck(now,props.order.date)
+        let nextDay = moment(props.order.date).isAfter(moment().format(),'date')
+
+        // first case time bofore time current 
+        if( sameDay && moment(selectedTime).isBefore(now,'time')){
+            showMessage({
+                message: "Invalid time slot. Please select valid time slot.",
+                type: "danger",
+                floating: true
+              });
+              return false;
+           
         }
 
 
+        if( sameDay && (moment(moment(selectedTime).subtract(2,'hours').format()).isBefore(now)
+        || 
+         moment(moment(selectedTime).subtract(2,'hours').format()).isSame(now) )){
+            showMessage({
+                message: "Please note appointements are made atleast 2 hours before so we can provide you with best of our services",
+                type: "danger",
+                floating: true
+              });
+              return false;
+        }
 
+        if ( sameDay && ( moment(selectedTime).isAfter(seven) )){
+            showMessage({
+                message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
+                type: "danger",
+                floating: true
+              });
+              return false;
+        }
 
+        if ( nextDay && (moment(selectedTime).isBefore(nineam))){
+            showMessage({
+                message: "Ops! Our service providing time starts at 9:30am",
+                type: "danger",
+                floating: true
+              });
+              return false;
+        }
 
-        //Checking Date again
-        if (order.time.getTime() == new Date(new Date().setHours(0,0,0,0)).getTime()) return
-        let selectedTime = props.order.time 
-        let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
-        let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
-        setShowTimePicker(false);
+        if( nextDay && (moment(selectedTime).isAfter(ninepm))){
+            showMessage({
+                message: "Please select time range between 9:30am-9:00pm for coming day",
+                type: "danger",
+                floating: true
+              });
+              return false;
+        }
 
-        //when cancel button press
-        if(!selectedTime) return 
+            return true
+        // if(sameDay){
 
-        now  = new Date()
-        let sameDay = moment(props.order.date).isSame(now,'date')
+            
+        //     //selected time on a same day should greater than now...
+        //     if (
+        //         moment(selectedTime).isAfter(startTime) 
+        //         &&
+        //         moment(selectedTime).isBefore(endTime)
+        //     ) {
 
-        if(sameDay){
-            //selected time on a same day should greater than now...
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-
-                if (
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
-                    || 
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
-                ) {
-                    showMessage({
-                                message: "Selected time should be 4 hours greater than now",
-                                type: "danger",
-                                floating: true
-                              });
-                } else {
-                    props.handleTextChange("time",selectedTime)
-                }
+        //         if (
+        //             moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
+        //             || 
+        //             moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
+        //         ) {
+        //             showMessage({
+        //                         message: "Selected time should be 4 hours greater than now",
+        //                         type: "danger",
+        //                         floating: true
+        //                       });
+        //         } else {
+        //             props.handleTextChange("time",selectedTime)
+        //         }
 
 
                 
-            } else {
-                showMessage({
-                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
-                    type: "danger",
-                    floating: true
-                });
-            }
+        //     } else {
+        //         showMessage({
+        //             message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
+        //             type: "danger",
+        //             floating: true
+        //         });
+        //     }
           
 
-        } else {
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-                props.handleTextChange("time",selectedTime)
-            } else {
-                showMessage({
-                    message: "Time can only be selected from 9:00 AM to 9:00 PM",
-                    type: "danger",
-                    floating: true
-                });
-            }
+        // } else {
+        //     if (
+        //         moment(selectedTime).isAfter(startTime) 
+        //         &&
+        //         moment(selectedTime).isBefore(endTime)
+        //     ) {
+        //         props.handleTextChange("time",selectedTime)
+        //     } else {
+        //         showMessage({
+        //             message: "Time can only be selected from 9:00 AM to 9:00 PM",
+        //             type: "danger",
+        //             floating: true
+        //         });
+        //     }
            
-        }
+        // }
     }
 
     const onChangeTime = (selectedTime) => {
 
-        let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
-        let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
+        
         setShowTimePicker(false);
 
         //when cancel button press
         if(!selectedTime) return 
 
-        let now  = new Date()
-        let sameDay = moment(props.order.date).isSame(now,'date')
-
-        if(sameDay){
-            //selected time on a same day should greater than now...
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-
-                if (
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
-                    || 
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
-                ) {
-                    showMessage({
-                                message: "Selected time should be 4 hours greater than now",
-                                type: "danger",
-                                floating: true
-                              });
-                } else {
-                    props.handleTextChange("time",selectedTime)
-                }
-
-
-                
-            } else {
-                showMessage({
-                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
-                    type: "danger",
-                    floating: true
-                });
-            }
-          
-
-        } else {
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-                props.handleTextChange("time",selectedTime)
-            } else {
-                showMessage({
-                    message: "Time can only be selected from 9:00 AM to 9:00 PM",
-                    type: "danger",
-                    floating: true
-                });
-            }
-           
-        }
+        props.handleTextChange("time",selectedTime)
+        
         
     }
 
@@ -220,24 +224,32 @@ function ScheduleOrder(props) {
         if(order.date == ""){
             showMessage({
                 message: "Please select the date",
-                type: "error",
+                type: "danger",
                 floating: true
             });
             return
-        }   
+        } else {
+            console.log('very funny',!validateDate(order.date))
+            if(!validateDate(order.date)) return;
+
+        } 
         if(order.time.getTime() == new Date(new Date().setHours(0,0,0,0)).getTime()){
             showMessage({
                 message: "Please select the time",
-                type: "error",
+                type: "danger",
                 floating: true
             });
             return
+        } else {
+            console.log('very happy',!validateTime(order.time))
+            if (!validateTime(order.time)) return;
+           
         }
         
         if(order.address == ""){
-            showMessage({
+            showMessage({ 
                 message: "Please enter the address",
-                type: "error",
+                type: "danger",
                 floating: true
             });
             return
@@ -245,7 +257,7 @@ function ScheduleOrder(props) {
         if(order.area == null || order.area == ""){
             showMessage({
                 message: "Please select the area",
-                type: "error",
+                type: "danger",
                 floating: true
             });
             return
