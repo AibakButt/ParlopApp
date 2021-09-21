@@ -81,128 +81,74 @@ function ScheduleOrder(props) {
 
 
 
-        //Checking Date again
-        if (order.time.getTime() == new Date(new Date().setHours(0,0,0,0)).getTime()) return
-        let selectedTime = props.order.time 
-        let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
-        let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
-        setShowTimePicker(false);
-
-        //when cancel button press
-        if(!selectedTime) return 
-
-        now  = new Date()
-        let sameDay = moment(props.order.date).isSame(now,'date')
-
-        if(sameDay){
-            //selected time on a same day should greater than now...
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-
-                if (
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
-                    || 
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
-                ) {
-                    showMessage({
-                                message: "Selected time should be 4 hours greater than now",
-                                type: "danger",
-                                floating: true
-                              });
-                } else {
-                    props.handleTextChange("time",selectedTime)
-                }
-
-
-                
-            } else {
-                showMessage({
-                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
-                    type: "danger",
-                    floating: true
-                });
-            }
-          
-
-        } else {
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-                props.handleTextChange("time",selectedTime)
-            } else {
-                showMessage({
-                    message: "Time can only be selected from 9:00 AM to 9:00 PM",
-                    type: "danger",
-                    floating: true
-                });
-            }
-           
-        }
+        //Checking Time again
     }
+       
+        
 
     const onChangeTime = (selectedTime) => {
 
-        let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
-        let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
+        // let startTime = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
+        // let endTime = moment().set({'hour': 21, 'minute': 1,'second':0}).format();
+        let seven = moment().set({'hour': 19, 'minute': 1,'second':0}).format();
+        let nine = moment().set({'hour': 9, 'minute': 1,'second':0}).format();
         setShowTimePicker(false);
 
         //when cancel button press
         if(!selectedTime) return 
 
-        let now  = new Date()
+        let now  = moment()
         let sameDay = moment(props.order.date).isSame(now,'date')
 
+     
+
         if(sameDay){
-            //selected time on a same day should greater than now...
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
 
-                if (
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isBefore(now) 
-                    || 
-                    moment(moment(selectedTime).subtract(4,'hours').format()).isSame(now)
-                ) {
-                    showMessage({
-                                message: "Selected time should be 4 hours greater than now",
-                                type: "danger",
-                                floating: true
-                              });
-                } else {
-                    props.handleTextChange("time",selectedTime)
-                }
-
-
-                
-            } else {
+            //If time selected before current time
+            if(moment(selectedTime).isBefore(now)){
                 showMessage({
-                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
+                    message: "Invalid time slot. Please select valid time slot",
+                    type: "danger",
+                    floating: true
+                  });
+            }
+
+            //If with in two hours
+            if(moment(moment(selectedTime).subtract(2,'hours').format()).isBefore(now)  ||  moment(moment(selectedTime).subtract(2,'hours').format()).isSame(now)){
+                showMessage({
+                    message: "Please note appointments are made atleast 2 hours before so we can provide you with best of our services",
+                    type: "danger",
+                    floating: true
+                  });
+            }
+            if(moment(selectedTime).isAfter(seven)){
+                showMessage({
+                    message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm.",
+                    type: "danger",
+                    floating: true
+                  });
+            }
+            else{
+                props.handleTextChange("time",selectedTime)
+            }
+         
+
+        } else {
+            if( moment(selectedTime).isBefore(nine)){
+                showMessage({
+                    message: "Ops! Our service providing time starts at 9:00am",
                     type: "danger",
                     floating: true
                 });
             }
-          
-
-        } else {
-            if (
-                moment(selectedTime).isAfter(startTime) 
-                &&
-                moment(selectedTime).isBefore(endTime)
-            ) {
-                props.handleTextChange("time",selectedTime)
-            } else {
+            if ( moment(selectedTime).isAfter(nine)  ) {
                 showMessage({
-                    message: "Time can only be selected from 9:00 AM to 9:00 PM",
+                    message: "Please select time range between 9:00am-9:00pm for tomorrow",
                     type: "danger",
                     floating: true
                 });
+            } else {
+                props.handleTextChange("time",selectedTime)
             }
            
         }

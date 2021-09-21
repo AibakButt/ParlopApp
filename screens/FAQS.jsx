@@ -9,6 +9,12 @@ function FAQS (props) {
         <Block>
             <ScrollView>
                 <Block>
+                    <Text bold style={{paddingHorizontal: theme.sizes.base, paddingVertical: theme.sizes.base/2}} size={18}>How Can You Contact Us?</Text>
+                    <Text style={{paddingHorizontal: theme.sizes.base, lineHeight: 25}} size={16}>
+                        You can contact us using the following numbers:{'\n'}
+                        1. 0311-1333921{'\n'}
+                        2. 0302-0480459
+                    </Text>
                     <Text style={{paddingHorizontal: theme.sizes.base, paddingVertical: theme.sizes.base/2}} size={18} bold>How do I book a service?</Text>
                     <Text style={{paddingHorizontal: theme.sizes.base, lineHeight: 25}} size={16}>
                         Appointment have to be made four hours in advance! Once your request is submitted, it will be processed and placed
@@ -41,6 +47,9 @@ function FAQS (props) {
                         We highly advise you not to tip the beautician. Parlor at Home is a social enterprise that enables independent beauticians to run 
                         their own beauty bussiness.
                     </Text>
+
+                   
+
 
                     <Text bold style={{paddingHorizontal: theme.sizes.base, paddingVertical: theme.sizes.base/2}} size={18}>Are there any transport charges?</Text>
                     <Text style={{paddingHorizontal: theme.sizes.base, lineHeight: 25}} size={16}>
