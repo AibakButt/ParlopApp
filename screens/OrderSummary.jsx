@@ -99,7 +99,7 @@ function OrderSummary (props) {
                         </Text>
                     </Block>
                     <Block flex={3} color={theme.colors.black} margin={theme.sizes.base} style={{borderRadius: 12}}>
-                        <Text accent size={22} style={{padding: theme.sizes.base, paddingBottom: 0}}>
+                        <Text white size={22} style={{padding: theme.sizes.base, paddingBottom: 0}}>
                             {console.log(order.date)}
                             { new Date(order.date).toDateString()}
                         </Text>
