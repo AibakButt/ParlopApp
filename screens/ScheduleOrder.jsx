@@ -107,6 +107,23 @@ function ScheduleOrder(props) {
            
         }
 
+        if ( sameDay &&  moment(selectedTime).isAfter(seven) ){
+            showMessage({
+                message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
+                type: "danger",
+                floating: true
+              });
+              return false;
+        }
+
+        if ( sameDay && (moment(selectedTime).isBefore(nineam))){
+            showMessage({
+                message: "Ops! Our service providing time starts at 9:30am",
+                type: "danger",
+                floating: true
+              });
+              return false;
+        }
 
         if( sameDay && (moment(moment(selectedTime).subtract(2,'hours').format()).isBefore(now)
         || 
@@ -119,14 +136,6 @@ function ScheduleOrder(props) {
               return false;
         }
 
-        if ( sameDay && ( moment(selectedTime).isAfter(seven) )){
-            showMessage({
-                message: "Ohh! Sorry we are closed for today. Kindly book your order for tomorrow between 9:30am to 9:00pm",
-                type: "danger",
-                floating: true
-              });
-              return false;
-        }
 
         if ( nextDay && (moment(selectedTime).isBefore(nineam))){
             showMessage({

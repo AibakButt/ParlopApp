@@ -29,7 +29,7 @@ const {
   debug,
   timing,
   clockRunning,
-  interpolate,
+  interpolateNode,
   Extrapolate,
   concat
 } = Animated;
@@ -97,37 +97,37 @@ class Register extends Component {
         }
       ]);
 
-    this.buttonY = interpolate(this.buttonOpacity, {
+    this.buttonY = interpolateNode(this.buttonOpacity, {
       inputRange: [0, 1],
       outputRange: [100, 0],
       extrapolate: Extrapolate.CLAMP
     });
 
-    this.bgY = interpolate(this.buttonOpacity, {
+    this.bgY = interpolateNode(this.buttonOpacity, {
       inputRange: [0, 1],
       outputRange: [-height / 3, 0],
       extrapolate: Extrapolate.CLAMP
     });
 
-    this.textInputZIndex = interpolate(this.buttonOpacity, {
+    this.textInputZIndex = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [1, -1],
         extrapolate: Extrapolate.CLAMP
     });
 
-    this.textInputY = interpolate(this.buttonOpacity, {
+    this.textInputY = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [0, 100],
         extrapolate: Extrapolate.CLAMP
     });
 
-    this.textInputOpacity = interpolate(this.buttonOpacity, {
+    this.textInputOpacity = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [1, 0],
         extrapolate: Extrapolate.CLAMP
     });
 
-    this.rotateCross = interpolate(this.buttonOpacity, {
+    this.rotateCross = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [180, 360],
         extrapolate: Extrapolate.CLAMP
@@ -255,7 +255,7 @@ class Register extends Component {
           }
         </TouchableOpacity>
         <Block row space="around">
-            <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
+            <TouchableOpacity onPress={() => this.setState({showTextInput: 'phone'})}>
                 <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.props.resendCode(this.props.auth)}>

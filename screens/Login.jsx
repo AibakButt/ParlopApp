@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, StyleSheet, Image, Dimensions, TextInput, TouchableOpacity,ActivityIndicator, Keyboard, Platform, KeyboardAvoidingView } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, { EasingNode } from 'react-native-reanimated';
 import { TapGestureHandler, State, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import Icon from '../components/Icon';
 import { connect } from "react-redux";
@@ -28,7 +28,7 @@ const {
   debug,
   timing,
   clockRunning,
-  interpolate,
+  interpolateNode,
   Extrapolate,
   concat
 } = Animated;
@@ -44,7 +44,7 @@ function runTiming(clock, value, dest) {
   const config = {
     duration: 1000,
     toValue: new Value(0),
-    easing: Easing.inOut(Easing.ease)
+    easing: EasingNode.inOut(EasingNode.ease)
   };
 
   return block([
@@ -96,37 +96,37 @@ class Login extends Component {
         }
       ]);
 
-    this.buttonY = interpolate(this.buttonOpacity, {
+    this.buttonY = interpolateNode(this.buttonOpacity, {
       inputRange: [0, 1],
       outputRange: [100, 0],
       extrapolate: Extrapolate.CLAMP
     });
 
-    this.bgY = interpolate(this.buttonOpacity, {
+    this.bgY = interpolateNode(this.buttonOpacity, {
       inputRange: [0, 1],
       outputRange: [-height / 3, 0],
       extrapolate: Extrapolate.CLAMP
     });
 
-    this.textInputZIndex = interpolate(this.buttonOpacity, {
+    this.textInputZIndex = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [1, -1],
         extrapolate: Extrapolate.CLAMP
     });
 
-    this.textInputY = interpolate(this.buttonOpacity, {
+    this.textInputY = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [0, 100],
         extrapolate: Extrapolate.CLAMP
     });
 
-    this.textInputOpacity = interpolate(this.buttonOpacity, {
+    this.textInputOpacity = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [1, 0],
         extrapolate: Extrapolate.CLAMP
     });
 
-    this.rotateCross = interpolate(this.buttonOpacity, {
+    this.rotateCross = interpolateNode(this.buttonOpacity, {
         inputRange: [0, 1],
         outputRange: [180, 360],
         extrapolate: Extrapolate.CLAMP
@@ -242,7 +242,7 @@ class Login extends Component {
         </TouchableOpacity>
         <Block row space="around">
             
-            <TouchableOpacity onPress={() => this.setState({codeFeildShow: false})}>
+            <TouchableOpacity onPress={() => this.setState({showTextInput: 'phone'})}>
                 <Text style={{textDecorationLine: "underline", color: theme.colors.gray}}>Change Phone Number</Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => this.props.navigation.navigate("Forgot")}>
